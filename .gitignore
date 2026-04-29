@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ChromaDB vector cache
+.chroma_ai_guidance/
+
+
+AIGuidance_20260428.md
