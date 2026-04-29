@@ -83,4 +83,5 @@ def get_azure_settings() -> dict:
             api_version,
         ),
         "model_name": _clean(os.getenv("AZURE_OPENAI_MODEL_NAME", model_name), model_name),
+        "fernet_key": _clean(os.getenv("FERNET_KEY", ""), ""),
     }

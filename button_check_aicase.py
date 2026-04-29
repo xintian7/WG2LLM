@@ -6,9 +6,10 @@ import sys
 import streamlit as st
 
 from func_OpenAI_query import _cli_main
+from env_loader import get_azure_settings
 
 
-_GUIDANCE_MD = Path(__file__).parent / "AIGuidance_20260428.md"
+_GUIDANCE_MD = Path(__file__).parent / "AIGuidance_20260428.md.enc"
 
 
 def get_ai_guidance_status() -> dict:
@@ -22,14 +23,24 @@ def get_ai_guidance_status() -> dict:
             "message": f"Guidance file not found: {_GUIDANCE_MD.name}",
         }
 
-    content = _GUIDANCE_MD.read_text(encoding="utf-8").strip()
-    if not content:
+    token = _GUIDANCE_MD.read_bytes().strip()
+    if not token:
         return {
             "ready": False,
             "chunks": 0,
             "cached": False,
             "last_load_sec": None,
             "message": f"Guidance file is empty: {_GUIDANCE_MD.name}",
+        }
+
+    settings = get_azure_settings()
+    if not (settings.get("fernet_key") or "").strip():
+        return {
+            "ready": False,
+            "chunks": 0,
+            "cached": False,
+            "last_load_sec": None,
+            "message": "FERNET_KEY is not set in environment.",
         }
 
     return {

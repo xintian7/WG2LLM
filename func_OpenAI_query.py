@@ -6,8 +6,11 @@ other scripts.
 
 from pathlib import Path
 import sys
+import base64
+import hashlib
 
 from openai import AzureOpenAI
+from cryptography.fernet import Fernet, InvalidToken
 
 from env_loader import get_azure_settings
 
@@ -34,7 +37,7 @@ QUESTION_ROUTING_RULES = (
 
 DEFAULT_MODEL = "gpt-4.1-mini"
 DEFAULT_API_VERSION = "2024-12-01-preview"
-DEFAULT_GUIDANCE_FILE = "AIGuidance_20260428.md"
+DEFAULT_GUIDANCE_FILE = "AIGuidance_20260428.md.enc"
 DEFAULT_ENDPOINT = "https://azureopenaitsu.openai.azure.com/"
 
 
@@ -60,6 +63,32 @@ def _dedupe_non_empty(values: list[str]) -> list[str]:
         if cleaned and cleaned not in output:
             output.append(cleaned)
     return output
+
+
+def _derive_fernet_key(passphrase: str) -> bytes:
+    """Derive a Fernet key from a passphrase using SHA-256 + urlsafe base64."""
+    return base64.urlsafe_b64encode(hashlib.sha256(passphrase.encode("utf-8")).digest())
+
+
+def _load_guidance_text(guidance_path: Path) -> str:
+    """Load guidance text from plaintext markdown or Fernet-encrypted token file."""
+    if guidance_path.suffix == ".enc":
+        settings = get_azure_settings()
+        passphrase = (settings.get("fernet_key") or "").strip()
+        if not passphrase:
+            raise ValueError("FERNET_KEY is missing. Please set it in .env.")
+
+        token = guidance_path.read_bytes().strip()
+        if not token:
+            raise ValueError(f"Guidance file is empty: {guidance_path}")
+
+        try:
+            fernet = Fernet(_derive_fernet_key(passphrase))
+            return fernet.decrypt(token).decode("utf-8").strip()
+        except InvalidToken as exc:
+            raise ValueError("Unable to decrypt guidance file. Check FERNET_KEY in .env.") from exc
+
+    return guidance_path.read_text(encoding="utf-8").strip()
 
 
 def _normalize_answer_output(answer_text: str) -> str:
@@ -129,7 +158,7 @@ def query_openai_with_guidance(
     if not guidance_path.exists():
         raise FileNotFoundError(f"Guidance file is missing: {guidance_path}")
 
-    guidance_text = guidance_path.read_text(encoding="utf-8").strip()
+    guidance_text = _load_guidance_text(guidance_path)
     if not guidance_text:
         raise ValueError(f"Guidance file is empty: {guidance_path}")
 
