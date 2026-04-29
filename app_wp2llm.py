@@ -236,6 +236,8 @@ with st.sidebar:
 
     st.markdown("### Disclaimer")
     st.markdown("Please carefully review the [Terms of Use](?doc=terms) and [Privacy Policy](?doc=privacy) before using this app. By using the app, you agree to the terms outlined in these documents.")
+    st.markdown("### User Guide")
+    st.markdown("Please carefully read the [User Guide](https://xintian.notion.site/TSU-AI-Assistant-User-Guide-35134913e84c80a28fa4d0e377d1aaac?source=copy_link).")
     # st.markdown(
     #     "[Privacy Policy](?doc=privacy)  \n[Terms of Use](?doc=terms)"
     # )
