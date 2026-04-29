@@ -183,7 +183,7 @@ active_panel = st.session_state.get("active_panel")
 
 if active_panel == "ai_guidance":
     st.divider()
-    st.markdown("<h3 style='text-align:center'>Check AI use cases from the AI guidance</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align:center'>Check AI use cases based on the AI guidance</h3>", unsafe_allow_html=True)
     ai_guidance_container = st.container()
     with ai_guidance_container:
         kb_status = get_ai_guidance_status()
