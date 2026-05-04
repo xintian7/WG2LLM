@@ -57,6 +57,28 @@ def answer_ai_case_question(question: str) -> str:
     return _cli_main(question)
 
 
+def _format_answer_display(answer: str) -> str:
+    text = (answer or "").strip()
+    if not text:
+        return text
+
+    lines = [line.rstrip() for line in text.splitlines()]
+    replacements = {
+        "1) Permission category:": "1) **Permission category:**",
+        "2) Why:": "2) **Why:**",
+        "3) What to pay attention to:": "3) **What to pay attention to:**",
+    }
+    formatted = []
+    for line in lines:
+        updated = line
+        for needle, repl in replacements.items():
+            if needle in updated:
+                updated = updated.replace(needle, repl, 1)
+                break
+        formatted.append(updated)
+    return "\n".join(formatted)
+
+
 def perform_check_aicase(
     query: str,
     container,
@@ -83,11 +105,7 @@ def perform_check_aicase(
                     answer or "No answer content was returned by Azure OpenAI."
                 )
                 st.caption(f"Question: {st.session_state['ai_case_last_query']}")
-                st.text_area(
-                    "AI Use Case Result",
-                    height=220,
-                    key="ai_case_result_box",
-                )
+                st.markdown(_format_answer_display(st.session_state["ai_case_result_box"]))
                 return answer or ""
             except Exception as exc:
                 st.error(str(exc))
