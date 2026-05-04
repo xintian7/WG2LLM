@@ -5,7 +5,7 @@ import sys
 
 import streamlit as st
 
-from func_OpenAI_query import _cli_main
+from functions.func_OpenAI_query import _cli_main
 from functions.env_loader import get_azure_settings
 
 

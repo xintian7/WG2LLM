@@ -221,12 +221,25 @@ if active_panel == "ai_guidance":
             key="ai_guidance_query",
             height=120,
         )
-        if st.button("Submit", key="ai_guidance_submit", type="primary"):
+        st.selectbox(
+            "Model",
+            options=["gpt-4.1-mini"],
+            index=0,
+            key="ai_guidance_model",
+        )
+        # st.caption("More models will be added in future versions.")
+        share_with_tsu = st.checkbox(
+            "Share my prompt with TSU for App improvement (optional)",
+            key="ai_guidance_share_prompt",
+            value=True,
+        )
+        submitted = st.button("Submit", key="ai_guidance_submit", type="primary")
+        if submitted:
             answer_text = perform_ai_guidance(
                 query=user_query,
                 container=ai_guidance_container,
             )
-            if user_query.strip():
+            if share_with_tsu and user_query.strip():
                 try:
                     write_to_notion(user_query, _get_client_ip(), answer_text)
                 except Exception as exc:
@@ -283,5 +296,11 @@ with st.sidebar:
     #                   key="azure_api_version")
 
     st.markdown("### To-do")
-    st.checkbox("Add use case scenario analysis.", value=False, key="todo_use_case_scenario_analysis")
+    st.checkbox("Add use case scenario analysis. （v0.2）", value=False, key="todo_use_case_scenario_analysis")
+    st.checkbox("Add feature report new AI cases. （v0.2）", value=False, key="todo_report_new_ai_cases")
+    st.checkbox("Add feature check grammar. （v0.3）", value=False, key="todo_check_grammar")
+    st.checkbox("Add feature rephrase sentences. （v0.4）", value=False, key="todo_rephrase_sentences")
+    st.checkbox("General maintenance. （v0.5）", value=False, key="todo_maintenance")
+    st.checkbox("Add more models from Azure OpenAI, Mistral, Claude, etc. （v0.6）", value=False, key="todo_more_models")
+    st.checkbox("Content comparison between AR7 and AR6. （v0.7）", value=False, key="todo_content_comparison")
 

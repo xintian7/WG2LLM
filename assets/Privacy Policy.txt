@@ -9,6 +9,7 @@ This preliminary Privacy Policy outlines how WGII AI Assistant may collect, use,
 We may potentially collect the following types of information:
 
 - Search queries and usage patterns that may help improve the service
+- Submission timestamps (CET/CEST) and IP address (when available) for logging improvement and tracking the misuse of the app.
 - Voluntary feedback and survey responses
 
 ## **3. Potential Uses of Information**
@@ -22,8 +23,7 @@ Information collected may be used for purposes such as:
 
 ## **4. Data Security Considerations**
 
-While we aim to implement reasonable security measures, including the use of on-premises database platform, we cannot guarantee the absolute security of any information transmitted or stored. By using this experimental service, you acknowledge these limitations.
-
+While we aim to implement reasonable security measures, including the use of secure third-party services for operational logging (e.g., Notion), we cannot guarantee the absolute security of any information transmitted or stored. Logged data may include submitted questions, generated answers, timestamps, and IP address where available. By using this experimental service, you acknowledge these limitations.
 ## **5. Data Retention**
 
 We have not yet established formal data retention policies. Information may be retained for indefinite periods as needed for research and development purposes.
