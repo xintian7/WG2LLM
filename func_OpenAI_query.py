@@ -12,7 +12,7 @@ import hashlib
 from openai import AzureOpenAI
 from cryptography.fernet import Fernet, InvalidToken
 
-from env_loader import get_azure_settings
+from functions.env_loader import get_azure_settings
 
 ANSWER_TEMPLATE = (
     "Use this exact output template:\n"

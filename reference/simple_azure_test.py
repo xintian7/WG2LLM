@@ -6,10 +6,10 @@ from pathlib import Path
 import dotenv
 
 try:
-    from env_loader import get_azure_settings
+    from functions.env_loader import get_azure_settings
 except ModuleNotFoundError:
     sys.path.append(str(Path(__file__).resolve().parent.parent))
-    from env_loader import get_azure_settings
+    from functions.env_loader import get_azure_settings
 
 dotenv.load_dotenv()
 

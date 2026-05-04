@@ -6,7 +6,7 @@ import sys
 import streamlit as st
 
 from func_OpenAI_query import _cli_main
-from env_loader import get_azure_settings
+from functions.env_loader import get_azure_settings
 
 
 _GUIDANCE_MD = Path(__file__).parent / "AIGuidance_20260428.md.enc"
@@ -60,7 +60,7 @@ def answer_ai_case_question(question: str) -> str:
 def perform_check_aicase(
     query: str,
     container,
-) -> None:
+) -> str:
     """Run AI use case check for a UI submit event.
 
     func_OpenAI_query handles connection setting resolution internally.
@@ -68,11 +68,11 @@ def perform_check_aicase(
     question = (query or "").strip()
     if not question:
         container.warning("Please enter a question before submitting.")
-        return
+        return ""
 
     if not _GUIDANCE_MD.exists():
         container.error(f"Guidance file is missing: {_GUIDANCE_MD.name}")
-        return
+        return ""
 
     with container:
         with st.spinner("Checking AI use case..."):
@@ -88,16 +88,18 @@ def perform_check_aicase(
                     height=220,
                     key="ai_case_result_box",
                 )
+                return answer or ""
             except Exception as exc:
                 st.error(str(exc))
+                return ""
 
 
 def perform_ai_guidance(
     query: str,
     container,
-) -> None:
+) -> str:
     """Compatibility wrapper used by existing app wiring."""
-    perform_check_aicase(
+    return perform_check_aicase(
         query=query,
         container=container,
     )

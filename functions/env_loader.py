@@ -29,7 +29,7 @@ def _clean(value: str | None, default: str = "") -> str:
 
 def load_env() -> None:
     """Load environment variables from .env file if it exists.
-    
+
     Uses python-dotenv to load variables from .env into os.environ.
     If .env does not exist, silently continues (user can enter values manually).
     """
@@ -39,7 +39,7 @@ def load_env() -> None:
         # python-dotenv not installed; skip loading from .env
         return
 
-    env_file = Path(__file__).parent / ".env"
+    env_file = Path(__file__).resolve().parent.parent / ".env"
     if env_file.exists():
         load_dotenv(env_file, override=True)
 
@@ -62,11 +62,11 @@ def get_azure_client(**overrides: Any) -> AzureOpenAI:
 
 def get_azure_settings() -> dict:
     """Retrieve Azure OpenAI settings from environment variables.
-    
+
     Returns
     -------
     dict
-        Dictionary with keys: endpoint, api_key, chat_deployment, 
+        Dictionary with keys: endpoint, api_key, chat_deployment,
         embed_deployment, api_version (values may be empty strings if not set).
     """
     load_env()

@@ -1,7 +1,8 @@
 import streamlit as st
 from pathlib import Path
 from button_check_aicase import get_ai_guidance_status, perform_ai_guidance
-from env_loader import get_azure_settings
+from functions.env_loader import get_azure_settings
+from functions.write2notion import write_to_notion
 
 
 st.markdown("""
@@ -67,6 +68,19 @@ div.stButton > button[kind="secondary"]:hover {
 """, unsafe_allow_html=True)
 
 st.markdown('<div class="main-title">WGII AI Assistant</div>', unsafe_allow_html=True)
+
+
+def _get_client_ip() -> str:
+    ctx = getattr(st, "context", None)
+    headers = getattr(ctx, "headers", None) if ctx is not None else None
+    if not headers:
+        return ""
+
+    forwarded = headers.get("x-forwarded-for") or headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+
+    return headers.get("x-real-ip") or headers.get("X-Real-IP") or ""
 
 
 def render_text_document_page(doc_key: str) -> None:
@@ -208,10 +222,15 @@ if active_panel == "ai_guidance":
             height=120,
         )
         if st.button("Submit", key="ai_guidance_submit", type="primary"):
-            perform_ai_guidance(
+            answer_text = perform_ai_guidance(
                 query=user_query,
                 container=ai_guidance_container,
             )
+            if user_query.strip():
+                try:
+                    write_to_notion(user_query, _get_client_ip(), answer_text)
+                except Exception as exc:
+                    st.warning(f"Notion logging failed: {exc}")
 elif active_panel == "view_use_cases":
     render_ai_use_case_reference()
 elif active_panel in ("rephrase", "grammar", "report_use_case", "use_case_scenario_analysis"):
