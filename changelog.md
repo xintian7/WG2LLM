@@ -64,4 +64,18 @@ Notes & next steps:
 
 ---
 
+Date: 2026-05-09
+Version: v0.1c
+
+Main activities:
+- Added an author-responsibility warning notification below the Rephrased text output in the rephrase panel.
+- Included an explicit exclamation-style caution that authors must verify and proofread LLM-rephrased text before inclusion in the AR7 report.
+- Kept the notification placement in the output section to ensure visibility before copying/inserting rephrased content.
+
+Notes & next steps:
+- Consider applying a similar verification reminder in other AI-generated output panels for consistency.
+- Optionally add a short tooltip/user-guide note clarifying that LLM output should not replace expert judgment.
+
+---
+
 Last updated: 2026-05-09
