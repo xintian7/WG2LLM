@@ -199,7 +199,7 @@ elif active_panel == "report_use_case":
             show_divider=True,
             center_title=True,
             intro_text=(
-                "Please share new AI use cases that you think should be included in the AI guidance use case reference."
+                "Please share new AI use cases that you think should be included in the AI guidance use case reference. "
                 "Our WGII TSU will discuss and review all cases carefully and get "
                 "back to you if you indicate that we can contact you."
             ),

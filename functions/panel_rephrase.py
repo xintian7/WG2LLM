@@ -128,6 +128,10 @@ def render_rephrase_panel(get_client_ip: Callable[[], str]) -> None:
         key="rephrase_output_text_editable",
         height=260,
     )
+    st.warning(
+        "⚠️ Authors are responsible for verifying and proofreading LLM-rephrased text "
+        "before including it into the AR7 report."
+    )
     rephrase_copy_payload = json.dumps(st.session_state.get("rephrase_output_text_editable", ""))
     components.html(
         f"""
