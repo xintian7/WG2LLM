@@ -49,6 +49,12 @@ Use the deployed WGII AI Assistant URL provided by WGII TSU.
 - **Report a new AI use case**: under development.
 - **Use case scenario analysis**: under development.
 
+### Give feedback
+
+- Open **Give feedback** to access the feedback form.
+- Please share your questions or suggestions using the feedback form.
+- Feedback is submitted to the TSU feedback database for app improvement.
+
 ## 4) How responses are framed
 
 For permission-check style prompts, the app returns:

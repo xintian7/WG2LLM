@@ -1,8 +1,11 @@
 import streamlit as st
 from pathlib import Path
-from button_check_aicase import get_ai_guidance_status, perform_ai_guidance
-from functions.env_loader import get_azure_settings
-from functions.write2notion import write_to_notion
+from functions.feedback_form import FeedbackConfig, render_feedback_form
+from functions.main_buttons import render_main_buttons
+from functions.panel_ai_guidance import render_ai_guidance_panel
+from functions.panel_grammar import render_grammar_panel
+from functions.panel_reference import render_ai_use_case_reference
+from functions.panel_rephrase import render_rephrase_panel
 
 
 st.markdown("""
@@ -25,6 +28,13 @@ footer {
 # ---- IPCC STYLE ----
 st.markdown("""
 <style>
+:root {
+    --btn-blue: #1f77b4;
+    --btn-blue-hover: #166aa3;
+    --btn-gray: #8f98a3;
+    --btn-gray-hover: #7f8893;
+}
+
 .main-title {
     /* no background to keep default page background */
     color: #00a9cf;
@@ -37,37 +47,77 @@ st.markdown("""
 }
 
 div.stButton > button[kind="primary"] {
-    background-color: #1f77b4;
+    background-color: var(--btn-blue);
     color: #ffffff;
-    border: 1px solid #1f77b4;
-    min-height: 48px;
-    padding: 0.5rem 1.25rem;
+    border: 1px solid var(--btn-blue);
+    min-height: 40px;
+    padding: 0.4rem 1rem;
+    font-size: 0.95rem;
     white-space: nowrap;
 }
 
 div.stButton > button[kind="primary"]:hover {
-    background-color: #166aa3;
-    border-color: #166aa3;
+    background-color: var(--btn-blue-hover);
+    border-color: var(--btn-blue-hover);
 }
 
 div.stButton > button[kind="secondary"] {
-    background-color: #8f98a3;
+    background-color: var(--btn-blue);
     color: #ffffff;
-    border: 1px solid #8f98a3;
-    min-height: 48px;
-    padding: 0.5rem 1.25rem;
+    border: 1px solid var(--btn-blue);
+    min-height: 40px;
+    padding: 0.4rem 1rem;
+    font-size: 0.95rem;
     white-space: nowrap;
 }
 
 div.stButton > button[kind="secondary"]:hover {
-    background-color: #7f8893;
-    border-color: #7f8893;
+    background-color: var(--btn-blue-hover);
+    border-color: var(--btn-blue-hover);
+}
+
+div[data-testid="stFormSubmitButton"] button,
+div.stDownloadButton > button {
+    background-color: var(--btn-blue);
+    color: #ffffff;
+    border: 1px solid var(--btn-blue);
+    min-height: 40px;
+    padding: 0.4rem 1rem;
+    font-size: 0.95rem;
+}
+
+.st-key-main_btn_ai_guidance button,
+.st-key-main_btn_rephrase button,
+.st-key-main_btn_grammar button,
+.st-key-main_btn_reference button,
+.st-key-main_btn_report button,
+.st-key-main_btn_analysis button {
+    min-height: 48px;
+    padding: 0.5rem 1.25rem;
+    font-size: 1rem;
+}
+
+.st-key-main_btn_analysis button {
+    background-color: var(--btn-gray) !important;
+    border: 1px solid var(--btn-gray) !important;
+    color: #ffffff !important;
+}
+
+.st-key-main_btn_analysis button:hover {
+    background-color: var(--btn-gray-hover) !important;
+    border-color: var(--btn-gray-hover) !important;
+}
+
+div[data-testid="stTextArea"] textarea {
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-title">WGII AI Assistant</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">WGII AI Assistant &#129302;</div>', unsafe_allow_html=True)
 
 
 def _get_client_ip() -> str:
@@ -116,141 +166,53 @@ def render_text_document_page(doc_key: str) -> None:
     st.markdown("[Back to WGII AI Assistant](?)")
 
 
+def render_feedback_page() -> None:
+    st.divider()
+    render_feedback_form(FeedbackConfig(form_key="feedback_form_page"))
+    st.markdown("[Back to WGII AI Assistant](?)")
+
+
 query_params = st.query_params
 doc_key = query_params.get("doc")
 if doc_key:
     render_text_document_page(str(doc_key))
     st.stop()
 
+page_key = query_params.get("page")
+if page_key == "feedback":
+    render_feedback_page()
+    st.stop()
 
-def render_ai_use_case_reference() -> None:
-    """Display the AI use case reference image from assets."""
-    st.divider()
-    st.markdown("<h3 style='text-align:center'>AI Use Case Reference</h3>", unsafe_allow_html=True)
 
-    image_path = Path(__file__).parent / "assets" / "AIGuidance.webp"
-    if image_path.exists():
-        st.image(str(image_path), caption="Figure 1. AI Guidance Use Case Reference from the IPCC WGII Author Handbook.", use_container_width=True)
-        st.info(
-            "The AI use case reference will be updated soon after the publication of the report for the "
-            "[IPCC Workshop on Engaging Diverse Knowledge Systems and IPCC Workshop on Methods of Assessment](https://www.ipcc.ch/event/ipcc-workshop-on-engaging-diverse-knowledge-systems-and-ipcc-workshop-on-methods-of-assessment/)."
-        )
-        with image_path.open("rb") as img_file:
-            image_bytes = img_file.read()
-        st.download_button(
-            "Download figure",
-            data=image_bytes,
-            file_name="AIGuidance.webp",
-            mime="image/webp",
-            use_container_width=False,
-        )
-    else:
-        st.warning("Reference image not found: assets/AIGuidance.webp")
-
-# Pre-populate Azure settings from .env and refill any missing values on reruns.
-env_settings = get_azure_settings()
-session_env_keys = [
-    ("azure_endpoint", "endpoint"),
-    ("azure_api_key", "api_key"),
-    ("azure_chat_deployment", "chat_deployment"),
-    ("azure_embed_deployment", "embed_deployment"),
-    ("azure_api_version", "api_version"),
-]
-
-if "_env_settings_loaded" not in st.session_state:
-    for session_key, env_key in session_env_keys:
-        st.session_state[session_key] = (env_settings.get(env_key) or "").strip()
-    st.session_state["_env_settings_loaded"] = True
-else:
-    for session_key, env_key in session_env_keys:
-        if not (st.session_state.get(session_key, "") or "").strip():
-            st.session_state[session_key] = (env_settings.get(env_key) or "").strip()
-
-spacer_left, btn_wrap, spacer_right = st.columns([0.3, 6, 0.3])
-with btn_wrap:
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        if st.button("Check AI use cases", use_container_width=True, type="primary"):
-            st.session_state["active_panel"] = "ai_guidance"
-    with col2:
-        if st.button("Rephrase sentences", use_container_width=True, type="secondary"):
-            st.session_state["active_panel"] = "rephrase"
-    with col3:
-        if st.button("Check grammar", use_container_width=True, type="secondary"):
-            st.session_state["active_panel"] = "grammar"
-
-    row2_col1, row2_col2, row2_col3 = st.columns(3)
-    with row2_col1:
-        if st.button("View AI use case reference", use_container_width=True, type="primary"):
-            st.session_state["active_panel"] = "view_use_cases"
-    with row2_col2:
-        if st.button("Report a new AI use case", use_container_width=True, type="secondary"):
-            st.session_state["active_panel"] = "report_use_case"
-    with row2_col3:
-        if st.button("Use case scenario analysis", use_container_width=True, type="secondary"):
-            st.session_state["active_panel"] = "use_case_scenario_analysis"
-
-    row3_col1, row3_col2, row3_col3 = st.columns(3)
-
-active_panel = st.session_state.get("active_panel")
+active_panel = render_main_buttons()
 
 if active_panel == "ai_guidance":
-    st.divider()
-    st.markdown("<h3 style='text-align:center'>Check AI use cases based on the AI guidance</h3>", unsafe_allow_html=True)
-    ai_guidance_container = st.container()
-    with ai_guidance_container:
-        kb_status = get_ai_guidance_status()
-        if kb_status["ready"]:
-            parts = [
-                "Knowledge base: ready",
-                f"Indexed chunks: {kb_status['chunks']}",
-            ]
-            if kb_status["last_load_sec"] is not None:
-                parts.append(f"Last engine load: {kb_status['last_load_sec']}s")
-            if kb_status["cached"]:
-                parts.append("Engine cache: warm")
-            st.caption(" | ".join(parts))
-        else:
-            msg = kb_status["message"] or "Knowledge base is not ready yet."
-            st.caption(f"Knowledge base: not ready | {msg}")
-
-        user_query = st.text_area(
-            "Check whether an AI use case is permitted based on the AI guidance from the WGII AR7 Author Handbook:",
-            placeholder="e.g. Can I use AI to help rephrase a sentence in the assessment text?",
-            key="ai_guidance_query",
-            height=120,
-        )
-        st.selectbox(
-            "Model",
-            options=["gpt-4.1-mini"],
-            index=0,
-            key="ai_guidance_model",
-        )
-        # st.caption("More models will be added in future versions.")
-        share_with_tsu = st.checkbox(
-            "Share my prompt with TSU for App improvement (optional)",
-            key="ai_guidance_share_prompt",
-            value=True,
-        )
-        submitted = st.button("Submit", key="ai_guidance_submit", type="primary")
-        if submitted:
-            answer_text = perform_ai_guidance(
-                query=user_query,
-                container=ai_guidance_container,
-            )
-            if share_with_tsu and user_query.strip():
-                try:
-                    write_to_notion(user_query, _get_client_ip(), answer_text)
-                except Exception as exc:
-                    st.warning(f"Notion logging failed: {exc}")
+    render_ai_guidance_panel(_get_client_ip)
 elif active_panel == "view_use_cases":
     render_ai_use_case_reference()
-elif active_panel in ("rephrase", "grammar", "report_use_case", "use_case_scenario_analysis"):
+elif active_panel == "report_use_case":
+    render_feedback_form(
+        FeedbackConfig(
+            app_name="TSU_LLM_ReportNewUseCase",
+            form_key="report_use_case_form",
+            title="Report a new AI use case",
+            show_divider=True,
+            center_title=True,
+            intro_text=(
+                "Please share new AI use cases that you think should be included in the AI guidance use case reference."
+                "Our WGII TSU will discuss and review all cases carefully and get "
+                "back to you if you indicate that we can contact you."
+            ),
+            required_prompt_label="New AI use case *",
+            submit_button_type="primary",
+        )
+    )
+elif active_panel == "rephrase":
+    render_rephrase_panel(_get_client_ip)
+elif active_panel == "grammar":
+    render_grammar_panel(_get_client_ip)
+elif active_panel in ("use_case_scenario_analysis",):
     label_map = {
-        "rephrase": "Rephrase sentences",
-        "grammar": "Check grammar",
-        "report_use_case": "Report a new AI use case",
         "use_case_scenario_analysis": "Use case scenario analysis",
     }
     label = label_map.get(active_panel, "This feature")
@@ -270,6 +232,10 @@ with st.sidebar:
     st.markdown("Please carefully review the [Terms of Use](?doc=terms) and [Privacy Policy](?doc=privacy) before using this app. By using the app, you agree to the terms outlined in these documents.")
     st.markdown("### User Guide")
     st.markdown("Please carefully read the [User Guide](https://xintian.notion.site/TSU-AI-Assistant-User-Guide-35134913e84c80a28fa4d0e377d1aaac?source=copy_link).")
+    st.markdown("### Give feedback")
+    st.markdown("Please share your questions or suggestions using the [feedback form](?page=feedback). For other general questions, please contact tsu@ipccwg2.org.")
+    st.markdown("### Other WGII TSU Apps")
+    st.markdown("- [WGII Literature App](https://wg2literature.streamlit.app/)")
     # st.markdown(
     #     "[Privacy Policy](?doc=privacy)  \n[Terms of Use](?doc=terms)"
     # )

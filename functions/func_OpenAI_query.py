@@ -121,36 +121,30 @@ def _normalize_answer_output(answer_text: str) -> str:
     return text
 
 
-def query_openai_with_guidance(
+def _extract_token_usage(response) -> tuple[int | None, int | None]:
+    usage = getattr(response, "usage", None)
+    if usage is None:
+        return None, None
+    prompt_tokens = getattr(usage, "prompt_tokens", None)
+    completion_tokens = getattr(usage, "completion_tokens", None)
+
+    if not isinstance(prompt_tokens, int):
+        prompt_tokens = None
+    if not isinstance(completion_tokens, int):
+        completion_tokens = None
+
+    return prompt_tokens, completion_tokens
+
+
+def query_openai_with_guidance_result(
     question: str,
     md_filename: str = DEFAULT_GUIDANCE_FILE,
     endpoint: str = "",
     api_key: str = "",
     api_version: str = "",
     model: str = "",
-) -> str:
-    """Query Azure OpenAI using guidance markdown as context.
-
-    Parameters
-    ----------
-    question : str
-        User question to evaluate against the guidance.
-    md_filename : str, optional
-        Guidance markdown file name or path.
-    endpoint : str, optional
-        Azure OpenAI endpoint override.
-    api_key : str, optional
-        Azure OpenAI API key override.
-    api_version : str, optional
-        API version override.
-    model : str, optional
-        Model override (deployment/model name).
-
-    Returns
-    -------
-    str
-        Assistant answer text.
-    """
+) -> tuple[str, int | None, int | None]:
+    """Query Azure OpenAI and return answer plus prompt/completion token usage."""
     if not (question or "").strip():
         raise ValueError("Question is empty.")
 
@@ -236,7 +230,8 @@ def query_openai_with_guidance(
                                 model=use_model,
                             )
                             answer_text = (response.choices[0].message.content or "").strip()
-                            return _normalize_answer_output(answer_text)
+                            token_input, token_output = _extract_token_usage(response)
+                            return _normalize_answer_output(answer_text), token_input, token_output
                         except Exception as model_exc:
                             errors.append(
                                 f"endpoint={use_endpoint}, api_version={use_version}, model={use_model}: {model_exc}"
@@ -250,6 +245,47 @@ def query_openai_with_guidance(
         "Unable to reach Azure OpenAI with current settings. Tried fallback combinations in func_OpenAI_query. "
         f"Last error: {errors[-1] if errors else 'Unknown error'}"
     )
+
+
+def query_openai_with_guidance(
+    question: str,
+    md_filename: str = DEFAULT_GUIDANCE_FILE,
+    endpoint: str = "",
+    api_key: str = "",
+    api_version: str = "",
+    model: str = "",
+) -> str:
+    """Query Azure OpenAI using guidance markdown as context.
+
+    Parameters
+    ----------
+    question : str
+        User question to evaluate against the guidance.
+    md_filename : str, optional
+        Guidance markdown file name or path.
+    endpoint : str, optional
+        Azure OpenAI endpoint override.
+    api_key : str, optional
+        Azure OpenAI API key override.
+    api_version : str, optional
+        API version override.
+    model : str, optional
+        Model override (deployment/model name).
+
+    Returns
+    -------
+    str
+        Assistant answer text.
+    """
+    answer_text, _token_input, _token_output = query_openai_with_guidance_result(
+        question=question,
+        md_filename=md_filename,
+        endpoint=endpoint,
+        api_key=api_key,
+        api_version=api_version,
+        model=model,
+    )
+    return answer_text
 
 
 def answer_with_guidance(md_filename: str, question: str) -> str:
