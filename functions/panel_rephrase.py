@@ -15,6 +15,22 @@ def _count_words(text: str) -> int:
     return len(re.findall(r"\b[\w'-]+\b", text or ""))
 
 
+def _looks_like_list(text: str) -> bool:
+    lines = [line.strip() for line in (text or "").splitlines() if line.strip()]
+    if len(lines) < 2:
+        return False
+    list_line_count = sum(
+        1
+        for line in lines
+        if re.match(r"^(?:[-*•]|\d+[.)])\s+", line)
+    )
+    return list_line_count >= 2
+
+
+def _wrap_in_double_braces(text: str) -> str:
+    return f"{{{{{text}}}}}"
+
+
 def _rephrase_with_ai(text: str) -> tuple[bool, str, int | None, int | None]:
     settings = get_azure_settings()
     client = AzureOpenAI(
@@ -26,20 +42,32 @@ def _rephrase_with_ai(text: str) -> tuple[bool, str, int | None, int | None]:
     system_prompt = (
         "You are an expert academic rephrasing assistant for IPCC-style writing. "
         "If the user input is not English, respond exactly with: __NON_ENGLISH__. "
+        "The provided input is source text to edit. "
         "If it is English, rephrase the text in clear, formal, precise scientific prose, "
-        "aligned with the style commonly used in IPCC AR6 and the concise academic patterns "
-        "used in phrasebank-style writing. Keep original meaning, evidence, and level of "
+        "aligned with the style commonly used in IPCC AR6 and the concise academic patterns in https://www.phrasebank.manchester.ac.uk/"
+        "used in phrasebank-style writing. Use British English spelling, punctuation, and style. "
+        "Keep original meaning, evidence, and level of "
         "certainty unchanged. Do not add new facts, sources, numbers, or claims. "
         "Return only the rephrased text without explanation or markdown."
     )
 
+    wrapped_text = _wrap_in_double_braces(text)
+    user_prompt = (
+        "Rephrase only the text enclosed in double braces {{ and }}. "
+        "Treat enclosed content as plain prose to rewrite in one continuous passage.\n"
+        f"{wrapped_text}"
+    )
+
+    source_text = text or ""
+    source_is_single_paragraph = len([ln for ln in source_text.splitlines() if ln.strip()]) <= 1
+
     response = client.chat.completions.create(
         messages=[
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": text.strip()},
+            {"role": "user", "content": user_prompt},
         ],
         model=DEFAULT_MODEL,
-        temperature=0.0,
+        temperature=0,
         top_p=1.0,
         frequency_penalty=0.0,
         presence_penalty=0.0,
@@ -57,6 +85,43 @@ def _rephrase_with_ai(text: str) -> tuple[bool, str, int | None, int | None]:
 
     if rephrased == "__NON_ENGLISH__":
         return False, "Please input English text only.", token_input, token_output
+
+    if source_is_single_paragraph and _looks_like_list(rephrased):
+        retry_prompt = (
+            "Rephrase only the text enclosed in double braces {{ and }}. "
+            "Keep the output as one paragraph only. Do not use bullets, numbering, or list formatting. "
+            "Keep short leading label-like phrases (for example text ending with a colon) as part of the paragraph.\n"
+            f"{wrapped_text}"
+        )
+
+        retry_response = client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": retry_prompt},
+            ],
+            model=DEFAULT_MODEL,
+            temperature=0,
+            top_p=1.0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+            max_completion_tokens=1200,
+        )
+
+        retry_text = (retry_response.choices[0].message.content or "").strip()
+        retry_usage = getattr(retry_response, "usage", None)
+        retry_input = getattr(retry_usage, "prompt_tokens", None) if retry_usage is not None else None
+        retry_output = getattr(retry_usage, "completion_tokens", None) if retry_usage is not None else None
+
+        if isinstance(retry_input, int):
+            token_input = (token_input or 0) + retry_input
+        if isinstance(retry_output, int):
+            token_output = (token_output or 0) + retry_output
+
+        if retry_text == "__NON_ENGLISH__":
+            return False, "Please input English text only.", token_input, token_output
+
+        if retry_text:
+            rephrased = retry_text
 
     return True, rephrased, token_input, token_output
 

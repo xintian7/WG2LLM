@@ -223,7 +223,7 @@ def query_openai_with_guidance_result(
                                     },
                                 ],
                                 max_completion_tokens=256,
-                                temperature=0.0,
+                                temperature=0,
                                 top_p=1.0,
                                 frequency_penalty=0.0,
                                 presence_penalty=0.0,
