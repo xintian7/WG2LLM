@@ -26,7 +26,11 @@ def _rich_text_or_empty(value: str) -> list:
     text = (value or "").strip()
     if not text:
         return []
-    return [{"text": {"content": text}}]
+
+    # Notion rich_text text.content has a max length of 2000 characters.
+    max_len = 2000
+    chunks = [text[i:i + max_len] for i in range(0, len(text), max_len)]
+    return [{"text": {"content": chunk}} for chunk in chunks]
 
 
 def _build_notion_payload(

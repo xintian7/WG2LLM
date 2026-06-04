@@ -1,6 +1,7 @@
 import streamlit as st
 from pathlib import Path
 from functions.feedback_form import FeedbackConfig, render_feedback_form
+from functions.env_loader import get_app_version
 from functions.main_buttons import render_main_buttons
 from functions.panel_ai_guidance import render_ai_guidance_panel
 from functions.panel_grammar import render_grammar_panel
@@ -221,8 +222,9 @@ elif active_panel in ("use_case_scenario_analysis",):
 
 with st.sidebar:
     st.header("About")
+    app_version = get_app_version(default="0.1")
     st.markdown(
-        "<span style='color: #00a9cf; font-weight: bold;'>WGII AI Assistant</span> (ver 0.1) "
+        f"<span style='color: #00a9cf; font-weight: bold;'>WGII AI Assistant</span> (ver {app_version}) "
         "is a web app developed by the IPCC [WGII](https://www.ipcc.ch/working-group/wg2/) TSU to help IPCC authors use AI-enhanced functionalities. "
         "Please contact tsu@ipccwg2.org if you have any questions or suggestions.",
         unsafe_allow_html=True,
@@ -262,11 +264,12 @@ with st.sidebar:
     #                   key="azure_api_version")
 
     st.markdown("### To-do")
-    st.checkbox("Add use case scenario analysis. （v0.2）", value=False, key="todo_use_case_scenario_analysis")
-    st.checkbox("Add feature report new AI cases. （v0.2）", value=False, key="todo_report_new_ai_cases")
-    st.checkbox("Add feature check grammar. （v0.3）", value=False, key="todo_check_grammar")
-    st.checkbox("Add feature rephrase sentences. （v0.4）", value=False, key="todo_rephrase_sentences")
+    st.checkbox("Add feature report new AI cases. （v0.2）", value=True, key="todo_report_new_ai_cases")
+    st.checkbox("Add feature check grammar. （v0.3）", value=True, key="todo_check_grammar")
+    st.checkbox("Add feature rephrase sentences. （v0.4）", value=True, key="todo_rephrase_sentences")
+    st.checkbox("Add AI principles. （v0.4）", value=True, key="todo_ai_principles")
     st.checkbox("General maintenance. （v0.5）", value=False, key="todo_maintenance")
+    st.checkbox("Add use case scenario analysis. （v0.5）", value=False, key="todo_use_case_scenario_analysis")
     st.checkbox("Add more models from Azure OpenAI, Mistral, Claude, etc. （v0.6）", value=False, key="todo_more_models")
     st.checkbox("Content comparison between AR7 and AR6. （v0.7）", value=False, key="todo_content_comparison")
 

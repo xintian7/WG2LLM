@@ -2,6 +2,8 @@ import streamlit as st
 from pathlib import Path
 import json
 import pandas as pd
+import os
+import dotenv
 
 from button_search import perform_search
 from button_analyze import perform_analyze
@@ -14,6 +16,13 @@ from utils import (
     UN_MEMBER_STATES,
     UN_MEMBER_STATE_TO_COUNTRY_CODE,
 )
+
+dotenv.load_dotenv(Path(__file__).resolve().parent.parent / ".env", override=False)
+
+
+def _get_app_version(default: str = "0.1") -> str:
+    value = (os.getenv("APP_VERSION") or os.getenv("version") or default).strip()
+    return value or default
 
 
 st.markdown("""
@@ -144,8 +153,9 @@ with input_col:
 
 with st.sidebar:
     st.header("About")
+    app_version = _get_app_version(default="0.1")
     st.markdown(
-        "<span style='color: #00a9cf; font-weight: bold;'>Climate Knowledge Finder</span> (ver 0.1) "
+        f"<span style='color: #00a9cf; font-weight: bold;'>Climate Knowledge Finder</span> (ver {app_version}) "
         "is a web app developed by the IPCC [WGII](https://www.ipcc.ch/working-group/wg2/) TSU to help IPCC authors find climate-related grey literature from [OpenAlex](https://openalex.org)'s database. "
         "Please contact xxx@ipccwg2.org if you have any questions or suggestions.",
         unsafe_allow_html=True

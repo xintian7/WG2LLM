@@ -85,3 +85,15 @@ def get_azure_settings() -> dict:
         "model_name": _clean(os.getenv("AZURE_OPENAI_MODEL_NAME", model_name), model_name),
         "fernet_key": _clean(os.getenv("FERNET_KEY", ""), ""),
     }
+
+
+def get_app_version(default: str = "0.1") -> str:
+    """Return app version from environment.
+
+    Supports both APP_VERSION and legacy lowercase version keys in .env.
+    """
+    load_env()
+    version_value = _clean(os.getenv("APP_VERSION", os.getenv("version", default)), default)
+    if not version_value:
+        return default
+    return version_value

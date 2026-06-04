@@ -18,7 +18,23 @@ ANSWER_TEMPLATE = (
     "Use this exact output template:\n"
     "1) Permission category: <Permitted | Conditionally permitted | Not permitted | Unclear from guidance>\n"
     "2) Why: <Short reason grounded in the guidance text>\n"
-    "3) What to pay attention to: <List specific cautions, conditions, or limits explicitly mentioned in guidance; if none are mentioned, say 'Not explicitly mentioned in the guidance.'>"
+    "3) What to pay attention to:\n"
+    "- <Bullet point with a specific caution/condition/limit from guidance>\n"
+    "- <Add more bullets when relevant; if none are mentioned, write: Not explicitly mentioned in the guidance.>"
+)
+
+GENERAL_AI_STANDARD_RESPONSE = (
+    "1) Permission category: Conditionally permitted\n"
+    "2) Why: AI use in IPCC assessments is allowed only for specific support tasks such as grammar checking, word choice suggestions, literature discovery, data organization, and brainstorming, among others. However, AI must not be used for drafting assessment text, drawing scientific conclusions, or creating figures, as these require expert human judgment. All AI usage must be documented and comply with confidentiality and ethical principles.\n"
+    "3) What to pay attention to:\n"
+    "- AI cannot be used to generate assessment text, summaries, scientific conclusions, or figures.\n"
+    "- AI can assist with grammar, word choice, literature search, data cleaning, and brainstorming but requires author verification and responsibility.\n"
+    "- Confidentiality of draft content must be maintained; do not input unpublished material into AI systems without explicit data protection guarantees.\n"
+    "- All AI use must be declared via the AI Usage Declaration form with details on tools, purpose, verification, and limitations.\n"
+    "- Authors must maintain full understanding and responsibility for any AI-assisted content.\n"
+    "- TSUs provide oversight and may check drafts for undisclosed AI use.\n"
+    "- Use multiple AI models for brainstorming to reduce bias.\n"
+    "- AI tools have limitations such as outdated information, biases, and potential for incorrect outputs."
 )
 
 QUESTION_ROUTING_RULES = (
@@ -31,6 +47,8 @@ QUESTION_ROUTING_RULES = (
     "Response rules:\n"
     "- For (1): answer the question directly in plain prose based on guidance. Do NOT use the numbered template.\n"
     "- For (2): use the exact numbered template provided.\n"
+    "- For broad questions about whether AI can be used in IPCC assessments in general, return this exact response:\n"
+    f"{GENERAL_AI_STANDARD_RESPONSE}\n"
     "- For (3): respond exactly with: This question is not related to the AI guidance.\n"
     "Always use only the provided guidance text. Do not rely on outside knowledge."
 )
@@ -103,20 +121,6 @@ def _normalize_answer_output(answer_text: str) -> str:
 
     if "not related to the ai guidance" in lowered:
         return "This question is not related to the AI guidance."
-
-    if "1) permission category:" in lowered and "general ai" in lowered:
-        lines = [line.strip() for line in text.splitlines() if line.strip()]
-        why = ""
-        attention = ""
-        for line in lines:
-            l = line.lower()
-            if l.startswith("2) why:"):
-                why = line.split(":", 1)[1].strip() if ":" in line else ""
-            elif l.startswith("3) what to pay attention to:"):
-                attention = line.split(":", 1)[1].strip() if ":" in line else ""
-
-        merged = " ".join(part for part in [why, attention] if part).strip()
-        return merged or text
 
     return text
 

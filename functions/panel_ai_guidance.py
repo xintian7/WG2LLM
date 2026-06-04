@@ -9,6 +9,7 @@ from functions.write2notion import write_to_notion
 
 
 _GUIDANCE_MD = Path(__file__).resolve().parent.parent / "AIGuidance_20260428.md.enc"
+_AI_PRINCIPLES_TXT = Path(__file__).resolve().parent.parent / "AI Principles.txt"
 
 
 def get_ai_guidance_status() -> dict:
@@ -55,6 +56,44 @@ def _answer_ai_case_question(question: str) -> tuple[str, int | None, int | None
     return query_openai_with_guidance_result(question=question)
 
 
+def _load_ai_principles_text() -> str:
+    if not _AI_PRINCIPLES_TXT.exists():
+        return ""
+    return _AI_PRINCIPLES_TXT.read_text(encoding="utf-8").strip()
+
+
+def _append_point_four(answer: str) -> str:
+    base = (answer or "").strip()
+    principles = _load_ai_principles_text()
+    if not principles:
+        return base
+
+    lowered = base.lower()
+    if "4)" in lowered and "ai principles" in lowered:
+        return base
+
+    if not base:
+        return f"4) AI principles:\n{principles}"
+
+    return f"{base}\n\n4) AI principles:\n{principles}"
+
+
+def _strip_point_four(answer: str) -> str:
+    text = (answer or "").strip()
+    if not text:
+        return ""
+
+    marker = "\n\n4) AI principles:"
+    if marker in text:
+        return text.split(marker, 1)[0].rstrip()
+
+    marker_alt = "\n4) AI principles:"
+    if marker_alt in text:
+        return text.split(marker_alt, 1)[0].rstrip()
+
+    return text
+
+
 def _format_answer_display(answer: str) -> str:
     text = (answer or "").strip()
     if not text:
@@ -65,14 +104,27 @@ def _format_answer_display(answer: str) -> str:
         "1) Permission category:": "1) **Permission category:**",
         "2) Why:": "2) **Why:**",
         "3) What to pay attention to:": "3) **What to pay attention to:**",
+        "4) AI principles:": "4) **AI principles:**",
     }
     formatted = []
+    in_bullet_section = False
     for line in lines:
         updated = line
         for needle, repl in replacements.items():
             if needle in updated:
                 updated = updated.replace(needle, repl, 1)
                 break
+
+        lower_updated = updated.lower().strip()
+        if lower_updated.startswith("3) **what to pay attention to:**") or lower_updated.startswith("4) **ai principles:**"):
+            in_bullet_section = True
+        elif lower_updated.startswith("1)") or lower_updated.startswith("2)"):
+            in_bullet_section = False
+
+        # Keep bullets visually nested under numbered sections in Streamlit markdown.
+        if in_bullet_section and updated.strip().startswith("-"):
+            updated = f"    {updated.strip()}"
+
         formatted.append(updated)
     return "\n".join(formatted)
 
@@ -91,13 +143,14 @@ def perform_ai_guidance(query: str, container) -> tuple[str, int | None, int | N
         with st.spinner("Checking AI use case..."):
             try:
                 answer, token_input, token_output = _answer_ai_case_question(question)
+                answer_with_point_four = _append_point_four(answer or "")
                 st.session_state["ai_case_last_query"] = question
                 st.session_state["ai_case_result_box"] = (
-                    answer or "No answer content was returned by Azure OpenAI."
+                    answer_with_point_four or "No answer content was returned by Azure OpenAI."
                 )
                 st.caption(f"Question: {st.session_state['ai_case_last_query']}")
                 st.markdown(_format_answer_display(st.session_state["ai_case_result_box"]))
-                return answer or "", token_input, token_output
+                return answer_with_point_four or "", token_input, token_output
             except Exception as exc:
                 st.error(str(exc))
                 return "", None, None
@@ -151,7 +204,7 @@ def render_ai_guidance_panel(get_client_ip: Callable[[], str]) -> None:
             if user_query.strip():
                 try:
                     question_to_log = user_query if share_with_tsu else ""
-                    answer_to_log = answer_text if share_with_tsu else ""
+                    answer_to_log = _strip_point_four(answer_text) if share_with_tsu else ""
                     write_to_notion(
                         question_to_log,
                         get_client_ip(),

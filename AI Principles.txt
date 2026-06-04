@@ -1,0 +1,6 @@
+How do we use AI responsibly?
+
+- **Human accountability:** Authors remain fully responsible for all content. Any AI‑assisted output must be critically reviewed, justified, and owned by expert authors.
+- **Transparency and traceability:** All use of AI must be clearly disclosed and documented. Outputs must be verified by experts and remain traceable for further review and validation.
+- **Confidentiality and data protection:** Authors must not input sensitive or unpublished material into third‑party AI tools without explicit data‑protection agreements and safeguards. Authors are responsible for ensuring that all tools comply with IPCC rules on confidentiality, data protection, and information security.
+- **Comprehensiveness:** AI-assisted assessments requires the full breadth of relevant evidence and perspectives without bias.
