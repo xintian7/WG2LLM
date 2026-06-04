@@ -1,13 +1,13 @@
 import streamlit as st
 from pathlib import Path
 from functions.feedback_form import FeedbackConfig, render_feedback_form
-from functions.env_loader import get_app_version
 from functions.main_buttons import render_main_buttons
 from functions.panel_ai_guidance import render_ai_guidance_panel
 from functions.panel_grammar import render_grammar_panel
 from functions.panel_reference import render_ai_use_case_reference
 from functions.panel_rephrase import render_rephrase_panel
 
+ver = "0.4b"
 
 st.markdown("""
 <style>
@@ -222,9 +222,8 @@ elif active_panel in ("use_case_scenario_analysis",):
 
 with st.sidebar:
     st.header("About")
-    app_version = get_app_version(default="0.1")
     st.markdown(
-        f"<span style='color: #00a9cf; font-weight: bold;'>WGII AI Assistant</span> (ver {app_version}) "
+        f"<span style='color: #00a9cf; font-weight: bold;'>WGII AI Assistant</span> (ver {ver}) "
         "is a web app developed by the IPCC [WGII](https://www.ipcc.ch/working-group/wg2/) TSU to help IPCC authors use AI-enhanced functionalities. "
         "Please contact tsu@ipccwg2.org if you have any questions or suggestions.",
         unsafe_allow_html=True,
