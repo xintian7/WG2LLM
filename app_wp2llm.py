@@ -115,10 +115,29 @@ div[data-testid="stTextArea"] textarea {
     line-height: 1.6;
 }
 
+.restricted-user-notice {
+    background: #EAF4FF;
+    border: 1px solid #BBDFFF;
+    color: #1F2D3D;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 8px 0 14px 0;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown('<div class="main-title">WGII AI Assistant &#129302;</div>', unsafe_allow_html=True)
+st.markdown(
+    """
+    <div class="restricted-user-notice">
+        <strong>Please kindly note that, for operational reasons, this tool has been developed exclusively for WGII Coordinating Lead Authors (CLAs), Lead Authors (LAs), and Chapter Scientists (CSs) supporting their respective CLAs and LAs. Please do not share this tool beyond this designated user group.</strong>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 def _get_client_ip() -> str:
@@ -269,6 +288,7 @@ with st.sidebar:
     st.checkbox("Add AI principles. （v0.4）", value=True, key="todo_ai_principles")
     st.checkbox("General maintenance. （v0.5）", value=False, key="todo_maintenance")
     st.checkbox("Add use case scenario analysis. （v0.5）", value=False, key="todo_use_case_scenario_analysis")
-    st.checkbox("Add more models from Azure OpenAI, Mistral, Claude, etc. （v0.6）", value=False, key="todo_more_models")
-    st.checkbox("Content comparison between AR7 and AR6. （v0.7）", value=False, key="todo_content_comparison")
+    st.checkbox("Revise the use case reference based on the MA report. （v0.6）", value=False, key="todo_more_ai_use_cases")
+    # st.checkbox("Add more models from Azure OpenAI, Mistral, Claude, etc. （v0.6）", value=False, key="todo_more_models")
+    # st.checkbox("Content comparison between AR7 and AR6. （v0.7）", value=False, key="todo_content_comparison")
 
