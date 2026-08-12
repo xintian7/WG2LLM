@@ -28,6 +28,8 @@ class FeedbackConfig:
     required_prompt_label: str = "Question or suggestion *"
     submit_button_label: str = "Submit"
     submit_button_type: str = "secondary"
+    enter_to_submit: bool = True
+    submit_instruction_text: str | None = None
     timezone_name: str = "Europe/Paris"
     notion_token_env: str = "NOTION_TOKEN"
     notion_database_env: str = "DATABASE_ID_feedback"
@@ -124,7 +126,7 @@ def render_feedback_form(
     st.markdown(config.intro_text)
     st.markdown(config.form_instruction_text)
 
-    with st.form(config.form_key):
+    with st.form(config.form_key, enter_to_submit=config.enter_to_submit):
         name = st.text_input("Name (optional)", value="")
         chapter = st.text_input("Chapter (optional)", value="")
         email = st.text_input(
@@ -136,6 +138,8 @@ def render_feedback_form(
             "I would like to be contacted about this inquiry",
             value=False,
         )
+        if config.submit_instruction_text:
+            st.caption(config.submit_instruction_text)
         submitted = st.form_submit_button(
             config.submit_button_label,
             type=config.submit_button_type,

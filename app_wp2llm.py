@@ -115,6 +115,15 @@ div[data-testid="stTextArea"] textarea {
     line-height: 1.6;
 }
 
+div[data-testid="stTextArea"] [data-testid="InputInstructions"] {
+    font-size: 0;
+}
+
+div[data-testid="stTextArea"] [data-testid="InputInstructions"]::after {
+    content: "Click the button to apply";
+    font-size: 0.75rem;
+}
+
 .restricted-user-notice {
     background: #EAF4FF;
     border: 1px solid #BBDFFF;
@@ -225,6 +234,8 @@ elif active_panel == "report_use_case":
             ),
             required_prompt_label="New AI use case *",
             submit_button_type="primary",
+            enter_to_submit=False,
+            submit_instruction_text="Click the button",
         )
     )
 elif active_panel == "rephrase":
