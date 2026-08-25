@@ -1,25 +1,40 @@
 from openai import AzureOpenAI
-import os
 import sys
+from pathlib import Path
 
-import dotenv
-
-dotenv.load_dotenv()
-
-endpoint = "https://azureopenaitsu.openai.azure.com/"
-model_name = "gpt-4.1-mini"
-deployment = "gpt-4.1-mini"
+try:
+    from functions.env_loader import get_azure_settings
+except ModuleNotFoundError:
+    sys.path.append(str(Path(__file__).resolve().parent.parent))
+    from functions.env_loader import get_azure_settings
 
 
 def main() -> int:
     """Run a minimal Azure OpenAI chat completion smoke test."""
-    api_key = os.getenv("AZURE_API_KEY", "").strip()
-    if not api_key:
-        print("AZURE_API_KEY is missing. Please set it in .env.")
+    settings = get_azure_settings()
+    api_key = settings.get("api_key", "").strip()
+    endpoint = settings.get("endpoint", "").strip()
+    api_version = settings.get("api_version", "").strip()
+    model = (
+        settings.get("model_name", "").strip()
+        or settings.get("chat_deployment", "").strip()
+    )
+    missing = [
+        name
+        for name, value in (
+            ("AZURE_API_KEY", api_key),
+            ("AZURE_OPENAI_ENDPOINT", endpoint),
+            ("AZURE_API_VERSION", api_version),
+            ("AZURE_OPENAI_MODEL_NAME", model),
+        )
+        if not value
+    ]
+    if missing:
+        print("Missing Azure configuration in .env: " + ", ".join(missing))
         return 1
 
     client = AzureOpenAI(
-        api_version="2024-12-01-preview",
+        api_version=api_version,
         azure_endpoint=endpoint,
         api_key=api_key,
     )
@@ -40,7 +55,7 @@ def main() -> int:
         top_p=1.0,
         frequency_penalty=0.0,
         presence_penalty=0.0,
-        model=deployment,
+        model=model,
     )
 
     print(response.choices[0].message.content)

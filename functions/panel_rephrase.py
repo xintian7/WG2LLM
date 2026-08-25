@@ -6,8 +6,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from openai import AzureOpenAI
 
-from functions.env_loader import get_azure_settings
-from functions.func_OpenAI_query import DEFAULT_MODEL
+from functions.env_loader import get_azure_model_options, get_azure_settings
 from functions.write2notion import write_to_notion
 
 
@@ -31,10 +30,14 @@ def _wrap_in_double_braces(text: str) -> str:
     return f"{{{{{text}}}}}"
 
 
-def _rephrase_with_ai(text: str) -> tuple[bool, str, int | None, int | None]:
+def _rephrase_with_ai(text: str, model: str) -> tuple[bool, str, int | None, int | None]:
+    model = (model or "").strip()
+    if not model:
+        raise ValueError("A model must be selected.")
+
     settings = get_azure_settings()
     client = AzureOpenAI(
-        api_version=settings.get("api_version") or "2024-12-01-preview",
+        api_version=settings.get("api_version") or "",
         azure_endpoint=settings.get("endpoint") or "",
         api_key=settings.get("api_key") or "",
     )
@@ -66,7 +69,7 @@ def _rephrase_with_ai(text: str) -> tuple[bool, str, int | None, int | None]:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        model=DEFAULT_MODEL,
+        model=model,
         temperature=0,
         top_p=1.0,
         frequency_penalty=0.0,
@@ -99,7 +102,7 @@ def _rephrase_with_ai(text: str) -> tuple[bool, str, int | None, int | None]:
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": retry_prompt},
             ],
-            model=DEFAULT_MODEL,
+            model=model,
             temperature=0,
             top_p=1.0,
             frequency_penalty=0.0,
@@ -138,6 +141,12 @@ def render_rephrase_panel(get_client_ip: Callable[[], str]) -> None:
     if "rephrase_output_text_editable" not in st.session_state:
         st.session_state["rephrase_output_text_editable"] = st.session_state.get("rephrase_output_text", "")
 
+    try:
+        model_options = get_azure_model_options()
+    except ValueError as exc:
+        st.error(str(exc))
+        return
+
     rephrase_input_text = st.text_area(
         "Input text (English only, max 300 words)",
         key="rephrase_input_text",
@@ -146,6 +155,12 @@ def render_rephrase_panel(get_client_ip: Callable[[], str]) -> None:
     )
     rephrase_word_count = _count_words(rephrase_input_text)
     st.caption(f"Word count: {rephrase_word_count} / 300")
+    rephrase_model = st.selectbox(
+        "Model",
+        options=model_options,
+        index=0,
+        key="rephrase_model",
+    )
     share_rephrase_with_tsu = st.checkbox(
         "Share my prompts and results with TSU for App improvement (optional)",
         key="rephrase_share_prompt",
@@ -160,7 +175,10 @@ def render_rephrase_panel(get_client_ip: Callable[[], str]) -> None:
         else:
             with st.spinner("Rephrasing text..."):
                 try:
-                    ok, rephrased_or_msg, token_input, token_output = _rephrase_with_ai(rephrase_input_text)
+                    ok, rephrased_or_msg, token_input, token_output = _rephrase_with_ai(
+                        rephrase_input_text,
+                        model=rephrase_model,
+                    )
                 except Exception as exc:
                     st.error(f"Rephrasing failed: {exc}")
                     ok = False

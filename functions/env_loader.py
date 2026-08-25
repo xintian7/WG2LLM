@@ -13,11 +13,6 @@ from openai import AzureOpenAI
 # Requested startup style: load env at import/startup.
 dotenv.load_dotenv()
 
-endpoint = "https://azureopenaitsu.openai.azure.com/"
-model_name = "gpt-4.1-mini"
-deployment = "AzureOpenAITSU"
-api_version = "2024-12-01-preview"
-
 
 def _clean(value: str | None, default: str = "") -> str:
     """Normalize env values by trimming spaces and optional surrounding quotes."""
@@ -25,6 +20,16 @@ def _clean(value: str | None, default: str = "") -> str:
     if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in {'"', "'"}:
         return raw[1:-1].strip()
     return raw
+
+
+def _split_csv(value: str) -> tuple[str, ...]:
+    """Return unique, non-empty values from a comma-separated setting."""
+    values: list[str] = []
+    for item in (value or "").split(","):
+        cleaned = _clean(item)
+        if cleaned and cleaned not in values:
+            values.append(cleaned)
+    return tuple(values)
 
 
 def load_env() -> None:
@@ -66,25 +71,53 @@ def get_azure_settings() -> dict:
     Returns
     -------
     dict
-        Dictionary with keys: endpoint, api_key, chat_deployment,
-        embed_deployment, api_version (values may be empty strings if not set).
+        Dictionary with Azure connection and model configuration values.
     """
     load_env()
     return {
-        "endpoint": _clean(os.getenv("AZURE_ENDPOINT", os.getenv("AZURE_OPENAI_ENDPOINT", endpoint)), endpoint),
+        "endpoint": _clean(os.getenv("AZURE_ENDPOINT", os.getenv("AZURE_OPENAI_ENDPOINT", "")), ""),
         "api_key": _clean(os.getenv("AZURE_API_KEY", os.getenv("AZURE_OPENAI_KEY", "")), ""),
         "chat_deployment": _clean(
-            os.getenv("AZURE_CHAT_DEPLOYMENT", os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", deployment)),
-            deployment,
+            os.getenv("AZURE_CHAT_DEPLOYMENT", os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "")),
+            "",
         ),
-        "embed_deployment": _clean(os.getenv("AZURE_EMBED_DEPLOYMENT", "text-embedding-3-small"), "text-embedding-3-small"),
+        "embed_deployment": _clean(os.getenv("AZURE_EMBED_DEPLOYMENT", ""), ""),
         "api_version": _clean(
-            os.getenv("AZURE_API_VERSION", os.getenv("AZURE_OPENAI_API_VERSION", api_version)),
-            api_version,
+            os.getenv("AZURE_API_VERSION", os.getenv("AZURE_OPENAI_API_VERSION", "")),
+            "",
         ),
-        "model_name": _clean(os.getenv("AZURE_OPENAI_MODEL_NAME", model_name), model_name),
+        "model_name": _clean(os.getenv("AZURE_OPENAI_MODEL_NAME", ""), ""),
+        "available_models": _clean(os.getenv("AZURE_OPENAI_AVAILABLE_MODELS", ""), ""),
+        "ai_guidance_model": _clean(os.getenv("AZURE_AI_GUIDANCE_MODEL", ""), ""),
         "fernet_key": _clean(os.getenv("FERNET_KEY", ""), ""),
     }
+
+
+def get_azure_model_options() -> tuple[str, ...]:
+    """Return configured model choices with the default model first."""
+    settings = get_azure_settings()
+    options = _split_csv(
+        ",".join(
+            value
+            for value in (settings["model_name"], settings["available_models"])
+            if value
+        )
+    )
+    if not options:
+        raise ValueError(
+            "Azure model configuration is missing. Set AZURE_OPENAI_MODEL_NAME in .env."
+        )
+    return options
+
+
+def get_ai_guidance_model() -> str:
+    """Return the model configured specifically for AI guidance checks."""
+    model = get_azure_settings()["ai_guidance_model"]
+    if not model:
+        raise ValueError(
+            "AI guidance model configuration is missing. Set AZURE_AI_GUIDANCE_MODEL in .env."
+        )
+    return model
 
 
 def get_app_version(default: str = "0.1") -> str:

@@ -53,10 +53,7 @@ QUESTION_ROUTING_RULES = (
     "Always use only the provided guidance text. Do not rely on outside knowledge."
 )
 
-DEFAULT_MODEL = "gpt-4.1-mini"
-DEFAULT_API_VERSION = "2024-12-01-preview"
 DEFAULT_GUIDANCE_FILE = "AIGuidance_20260428.md.enc"
-DEFAULT_ENDPOINT = "https://azureopenaitsu.openai.azure.com/"
 
 
 def _resolve_guidance_path(md_filename: str) -> Path:
@@ -171,21 +168,19 @@ def query_openai_with_guidance_result(
         [
             endpoint,
             settings.get("endpoint", ""),
-            DEFAULT_ENDPOINT,
-            DEFAULT_ENDPOINT.rstrip("/"),
         ]
     )
     api_version_candidates = _dedupe_non_empty(
         [
             api_version,
             settings.get("api_version", ""),
-            DEFAULT_API_VERSION,
         ]
     )
-    # Restrict to known-good model path only.
+    requested_model = (model or "").strip()
     model_candidates = _dedupe_non_empty(
-        [
-            DEFAULT_MODEL,
+        [requested_model]
+        if requested_model
+        else [
             settings.get("model_name", ""),
         ]
     )
@@ -194,6 +189,10 @@ def query_openai_with_guidance_result(
         raise ValueError("AZURE_API_KEY is missing. Please set it in .env.")
     if not endpoint_candidates:
         raise ValueError("AZURE_OPENAI_ENDPOINT is missing. Please set it in .env.")
+    if not api_version_candidates:
+        raise ValueError("AZURE_API_VERSION is missing. Please set it in .env.")
+    if not model_candidates:
+        raise ValueError("AZURE_OPENAI_MODEL_NAME is missing. Please set it in .env.")
 
     errors: list[str] = []
     for use_key in api_key_candidates:
@@ -246,7 +245,7 @@ def query_openai_with_guidance_result(
                     )
 
     raise RuntimeError(
-        "Unable to reach Azure OpenAI with current settings. Tried fallback combinations in func_OpenAI_query. "
+        "Unable to reach Azure OpenAI with current configuration. "
         f"Last error: {errors[-1] if errors else 'Unknown error'}"
     )
 

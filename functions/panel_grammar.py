@@ -8,8 +8,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from openai import AzureOpenAI
 
-from functions.env_loader import get_azure_settings
-from functions.func_OpenAI_query import DEFAULT_MODEL
+from functions.env_loader import get_azure_model_options, get_azure_settings
 from functions.write2notion import write_to_notion
 
 
@@ -52,10 +51,14 @@ def _render_output_box(content_html: str) -> None:
     )
 
 
-def _correct_grammar_with_ai(text: str) -> tuple[bool, str, int | None, int | None]:
+def _correct_grammar_with_ai(text: str, model: str) -> tuple[bool, str, int | None, int | None]:
+    model = (model or "").strip()
+    if not model:
+        raise ValueError("A model must be selected.")
+
     settings = get_azure_settings()
     client = AzureOpenAI(
-        api_version=settings.get("api_version") or "2024-12-01-preview",
+        api_version=settings.get("api_version") or "",
         azure_endpoint=settings.get("endpoint") or "",
         api_key=settings.get("api_key") or "",
     )
@@ -83,7 +86,7 @@ def _correct_grammar_with_ai(text: str) -> tuple[bool, str, int | None, int | No
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        model=DEFAULT_MODEL,
+        model=model,
         temperature=0,
         top_p=1.0,
         frequency_penalty=0.0,
@@ -111,6 +114,12 @@ def render_grammar_panel(get_client_ip: Callable[[], str]) -> None:
     st.markdown("<h3 style='text-align:center'>Check grammar</h3>", unsafe_allow_html=True)
     st.markdown("Input English text (up to 3000 words) and receive a grammar-corrected version with highlighted changes.")
 
+    try:
+        model_options = get_azure_model_options()
+    except ValueError as exc:
+        st.error(str(exc))
+        return
+
     input_text = st.text_area(
         "Input text (English only, max 3000 words)",
         key="grammar_input_text",
@@ -119,6 +128,12 @@ def render_grammar_panel(get_client_ip: Callable[[], str]) -> None:
     )
     current_word_count = _count_words(input_text)
     st.caption(f"Word count: {current_word_count} / 3000")
+    grammar_model = st.selectbox(
+        "Model",
+        options=model_options,
+        index=0,
+        key="grammar_model",
+    )
     share_grammar_with_tsu = st.checkbox(
         "Share my prompts and results with TSU for App improvement (optional)",
         key="grammar_share_prompt",
@@ -133,7 +148,10 @@ def render_grammar_panel(get_client_ip: Callable[[], str]) -> None:
         else:
             with st.spinner("Checking grammar..."):
                 try:
-                    ok, corrected_text_or_msg, token_input, token_output = _correct_grammar_with_ai(input_text)
+                    ok, corrected_text_or_msg, token_input, token_output = _correct_grammar_with_ai(
+                        input_text,
+                        model=grammar_model,
+                    )
                 except Exception as exc:
                     st.error(f"Grammar check failed: {exc}")
                     ok = False

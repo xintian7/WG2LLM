@@ -3,7 +3,7 @@ from typing import Callable
 
 import streamlit as st
 
-from functions.env_loader import get_azure_settings
+from functions.env_loader import get_ai_guidance_model, get_azure_settings
 from functions.func_OpenAI_query import query_openai_with_guidance_result
 from functions.write2notion import write_to_notion
 
@@ -52,8 +52,11 @@ def get_ai_guidance_status() -> dict:
     }
 
 
-def _answer_ai_case_question(question: str) -> tuple[str, int | None, int | None]:
-    return query_openai_with_guidance_result(question=question)
+def _answer_ai_case_question(
+    question: str,
+    model: str,
+) -> tuple[str, int | None, int | None]:
+    return query_openai_with_guidance_result(question=question, model=model)
 
 
 def _load_ai_principles_text() -> str:
@@ -129,7 +132,11 @@ def _format_answer_display(answer: str) -> str:
     return "\n".join(formatted)
 
 
-def perform_ai_guidance(query: str, container) -> tuple[str, int | None, int | None]:
+def perform_ai_guidance(
+    query: str,
+    container,
+    model: str,
+) -> tuple[str, int | None, int | None]:
     question = (query or "").strip()
     if not question:
         container.warning("Please enter a question before submitting.")
@@ -142,7 +149,7 @@ def perform_ai_guidance(query: str, container) -> tuple[str, int | None, int | N
     with container:
         with st.spinner("Checking AI use case..."):
             try:
-                answer, token_input, token_output = _answer_ai_case_question(question)
+                answer, token_input, token_output = _answer_ai_case_question(question, model=model)
                 answer_with_point_four = _append_point_four(answer or "")
                 st.session_state["ai_case_last_query"] = question
                 st.session_state["ai_case_result_box"] = (
@@ -177,15 +184,21 @@ def render_ai_guidance_panel(get_client_ip: Callable[[], str]) -> None:
             msg = kb_status["message"] or "Knowledge base is not ready yet."
             st.caption(f"Knowledge base: not ready | {msg}")
 
+        try:
+            configured_ai_guidance_model = get_ai_guidance_model()
+        except ValueError as exc:
+            st.error(str(exc))
+            return
+
         user_query = st.text_area(
             "Check whether an AI use case is permitted based on the AI guidance from the WGII AR7 Author Handbook:",
             placeholder="e.g. Can I use AI to help rephrase a sentence in the assessment text?",
             key="ai_guidance_query",
             height=120,
         )
-        st.selectbox(
+        ai_guidance_model = st.selectbox(
             "Model",
-            options=["gpt-4.1-mini"],
+            options=[configured_ai_guidance_model],
             index=0,
             key="ai_guidance_model",
         )
@@ -200,6 +213,7 @@ def render_ai_guidance_panel(get_client_ip: Callable[[], str]) -> None:
             answer_text, token_input, token_output = perform_ai_guidance(
                 query=user_query,
                 container=ai_guidance_container,
+                model=ai_guidance_model,
             )
             if user_query.strip():
                 try:

@@ -280,18 +280,6 @@ with st.sidebar:
     # )
     
 
-    # with st.expander("Azure OpenAI Settings", expanded=False):
-    #     st.text_input("Endpoint", placeholder="https://<resource>.openai.azure.com/",
-    #                   label_visibility="visible", key="azure_endpoint")
-    #     st.text_input("API Key", placeholder="Azure OpenAI API key",
-    #                   type="password", key="azure_api_key")
-    #     st.text_input("Chat deployment", placeholder="e.g. gpt-4o",
-    #                   key="azure_chat_deployment")
-    #     st.text_input("Embedding deployment", placeholder="e.g. text-embedding-3-small",
-    #                   key="azure_embed_deployment")
-    #     st.text_input("API version", value="2024-12-01-preview",
-    #                   key="azure_api_version")
-
     st.markdown("### To-do")
     st.checkbox("Add feature report new AI cases. （v0.2）", value=True, key="todo_report_new_ai_cases")
     st.checkbox("Add feature check grammar. （v0.3）", value=True, key="todo_check_grammar")

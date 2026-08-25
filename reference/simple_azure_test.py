@@ -1,17 +1,12 @@
 from openai import AzureOpenAI
-import os
 import sys
 from pathlib import Path
-
-import dotenv
 
 try:
     from functions.env_loader import get_azure_settings
 except ModuleNotFoundError:
     sys.path.append(str(Path(__file__).resolve().parent.parent))
     from functions.env_loader import get_azure_settings
-
-dotenv.load_dotenv()
 
 ANSWER_TEMPLATE = (
     "Use this exact output template:\n"
@@ -48,10 +43,6 @@ def answer_with_guidance(md_filename: str, question: str) -> str:
     str
         Model response text.
     """
-    api_key = os.getenv("AZURE_API_KEY", "").strip()
-    if not api_key:
-        raise ValueError("AZURE_API_KEY is missing. Please set it in .env.")
-
     guidance_path = Path(md_filename)
     if not guidance_path.is_absolute():
         local_path = Path(__file__).parent / guidance_path
@@ -66,16 +57,25 @@ def answer_with_guidance(md_filename: str, question: str) -> str:
         raise ValueError(f"Guidance file is empty: {guidance_path}")
 
     settings = get_azure_settings()
+    api_key = settings.get("api_key", "").strip()
     endpoint = settings.get("endpoint", "").strip()
-    api_version = settings.get("api_version", "").strip() or "2024-12-01-preview"
+    api_version = settings.get("api_version", "").strip()
     model = (
         settings.get("model_name", "").strip()
         or settings.get("chat_deployment", "").strip()
-        or "gpt-4.1-mini"
     )
-
-    if not endpoint:
-        raise ValueError("AZURE_OPENAI_ENDPOINT is missing. Please set it in .env.")
+    missing = [
+        name
+        for name, value in (
+            ("AZURE_API_KEY", api_key),
+            ("AZURE_OPENAI_ENDPOINT", endpoint),
+            ("AZURE_API_VERSION", api_version),
+            ("AZURE_OPENAI_MODEL_NAME", model),
+        )
+        if not value
+    ]
+    if missing:
+        raise ValueError("Missing Azure configuration in .env: " + ", ".join(missing))
 
     client = AzureOpenAI(
         api_version=api_version,
