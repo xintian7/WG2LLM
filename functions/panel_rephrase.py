@@ -197,7 +197,7 @@ def render_rephrase_panel(get_client_ip: Callable[[], str]) -> None:
                             question_to_log,
                             get_client_ip(),
                             answer_to_log,
-                            app_name="TSU_LLM_rephrase",
+                            app_name=f"TSU_LLM_rephrase ({rephrase_model})",
                             token_input=token_input,
                             token_output=token_output,
                         )
