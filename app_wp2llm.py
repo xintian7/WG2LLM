@@ -7,7 +7,7 @@ from functions.panel_grammar import render_grammar_panel
 from functions.panel_reference import render_ai_use_case_reference
 from functions.panel_rephrase import render_rephrase_panel
 
-ver = "0.4b"
+ver = "0.5"
 
 st.markdown("""
 <style>
@@ -285,7 +285,7 @@ with st.sidebar:
     st.checkbox("Add feature check grammar. （v0.3）", value=True, key="todo_check_grammar")
     st.checkbox("Add feature rephrase sentences. （v0.4）", value=True, key="todo_rephrase_sentences")
     st.checkbox("Add AI principles. （v0.4）", value=True, key="todo_ai_principles")
-    st.checkbox("General maintenance. （v0.5）", value=False, key="todo_maintenance")
+    st.checkbox("General maintenance. （v0.5）", value=True, key="todo_maintenance")
     st.checkbox("Add use case scenario analysis. （v0.5）", value=False, key="todo_use_case_scenario_analysis")
     st.checkbox("Revise the use case reference based on the MA report. （v0.6）", value=False, key="todo_more_ai_use_cases")
     # st.checkbox("Add more models from Azure OpenAI, Mistral, Claude, etc. （v0.6）", value=False, key="todo_more_models")

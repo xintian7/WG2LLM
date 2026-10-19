@@ -3,7 +3,7 @@ from typing import Callable
 
 import streamlit as st
 
-from functions.env_loader import get_ai_guidance_model, get_azure_settings
+from functions.env_loader import format_model_label, get_ai_guidance_model, get_azure_settings
 from functions.func_OpenAI_query import query_openai_with_guidance_result
 from functions.write2notion import write_to_notion
 
@@ -200,6 +200,7 @@ def render_ai_guidance_panel(get_client_ip: Callable[[], str]) -> None:
             "Model",
             options=[configured_ai_guidance_model],
             index=0,
+            format_func=format_model_label,
             key="ai_guidance_model",
         )
         share_with_tsu = st.checkbox(

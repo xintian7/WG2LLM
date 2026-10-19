@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Use Case Reference for Assessment Development</title>
+  <style>
+    :root {
+      --navy: #073b70;
+      --navy2: #0b477f;
+      --green: #16834a;
+      --red: #d7193f;
+      --text: #17233a;
+      --grid: #b9c7d5;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      padding: 28px;
+      background: #f4f6f8;
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .page {
+      max-width: 1800px;
+      margin: auto;
+      background: white;
+      padding: 26px 28px 24px;
+      box-shadow: 0 2px 14px rgba(0, 0, 0, .08);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 34px;
+      line-height: 1.1;
+    }
+
+    .legend {
+      display: flex;
+      gap: 34px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 8px 0 16px;
+      font-size: 15px;
+    }
+
+    .legend span {
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .check,
+    .cross {
+      font-weight: 700;
+      font-size: 24px;
+      line-height: 1
+    }
+
+    .check {
+      color: var(--green)
+    }
+
+    .cross {
+      color: var(--red)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 14px;
+    }
+
+    th {
+      background: var(--navy);
+      color: white;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 16px;
+    }
+
+    th:nth-child(1) {
+      width: 15%
+    }
+
+    th:nth-child(2) {
+      width: 30%
+    }
+
+    th:nth-child(3) {
+      width: 10%
+    }
+
+    th:nth-child(4) {
+      width: 45%
+    }
+
+    td {
+      border: 1px solid var(--grid);
+      padding: 6px 10px;
+      vertical-align: middle;
+      line-height: 1.25;
+    }
+
+    .category {
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 15px;
+    }
+
+    .cat-cell {
+      background: #eef5fb;
+      font-weight: 700;
+      color: var(--navy);
+      vertical-align: top;
+    }
+
+    .permission {
+      text-align: center;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .permission.green {
+      color: var(--green)
+    }
+
+    .permission.red {
+      color: var(--red)
+    }
+
+    .attention {
+      background: #fffaf0;
+      padding: 7px 12px;
+    }
+
+    .attention ol {
+      margin: 0;
+      padding-left: 27px;
+    }
+
+    .attention li {
+      margin: 2px 0
+    }
+
+    .n {
+      display: inline-flex;
+      width: 22px;
+      height: 22px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #d58a18;
+      color: white;
+      font-weight: 700;
+      font-size: 12px;
+      margin-right: 7px;
+    }
+
+    .principles {
+      display: grid;
+      grid-template-columns: 220px repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .principles-title {
+      background: var(--navy);
+      color: white;
+      padding: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+    }
+
+    .principle {
+      background: #eaf3fb;
+      padding: 11px 12px;
+      border-radius: 7px;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .principle h3 {
+      margin: 0 0 5px;
+      color: var(--navy);
+      font-size: 13px;
+    }
+
+    .pnum {
+      display: inline-flex;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: white;
+      align-items: center;
+      justify-content: center;
+      margin-right: 5px;
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0
+      }
+
+      .page {
+        box-shadow: none;
+        max-width: none
+      }
+
+      @page {
+        size: A3 landscape;
+        margin: 10mm
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <h1>AI Use Case Reference for Assessment Development</h1>
+    <div class="legend">
+      <span><b class="check">✓</b> Permitted: AI use is acceptable with proper documentation, data protection, and
+        verification.</span>
+      <span><b class="cross">✕</b> Prohibited: AI use is strictly forbidden.</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>AI Use Case</th>
+          <th>Permission</th>
+          <th>What to pay attention to</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="cat-cell" rowspan="3">💡 Brainstorming and ideation</td>
+          <td>Conceptual exploration (AI queries to explore different perspectives on scientific concepts)</td>
+          <td class="permission green">✓</td>
+          <td class="attention" rowspan="3">
+            <ol>
+              <li>Disclose and document all used AI-assisted tools.</li>
+              <li>Ensure expert authors critically review suggestions and remain fully accountable for adopted ideas.
+              </li>
+              <li>Cross-check outputs with diverse evidence to reduce bias and improve comprehensiveness.</li>
+              <li>Do not develop arguments based on AI.</li>
+
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td>Scope gap identification (AI assistance in identifying potential additional research questions for
+            inclusion in the report)</td>
+          <td class="permission green">✓</td>
+        </tr>
+        <tr>
+          <td>Argument development (AI assistance to develop scientific arguments)</td>
+          <td class="permission red">✕</td>
+        </tr>
+
+        <tr>
+          <td class="cat-cell" rowspan="3">📖 Evidence and knowledge discovery, organisation, review</td>
+          <td>AI-powered search tools (preliminary literature discovery)</td>
+          <td class="permission green">✓</td>
+          <td class="attention" rowspan="3">
+            <ol>
+              <li>Disclose and document used tools and verification methods.</li>
+              <li>Ensure expert authors verify relevance, quality, and credibility of identified sources.</li>
+              <li>Use multiple search approaches to avoid narrow retrieval and improve comprehensiveness.</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td>Literature quality screening</td>
+          <td class="permission green">✓</td>
+        </tr>
+        <tr>
+          <td>Reference organisation (by topic or methodology)</td>
+          <td class="permission green">✓</td>
+        </tr>
+
+        <tr>
+          <td class="cat-cell" rowspan="7">🗄️ Scientific analysis</td>
+          <td>Dataset organisation</td>
+          <td class="permission green">✓</td>
+          <td class="attention" rowspan="7">
+            <ol>
+              <li>Disclose and document AI-assisted methods.</li>
+              <li>Ensure data analysts validate all processing and analysis results before use.</li>
+              <li>Do not interpret data patterns by AI.</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td>Data preprocessing</td>
+          <td class="permission green">✓</td>
+        </tr>
+        <tr>
+          <td>Pattern identification</td>
+          <td class="permission green">✓</td>
+        </tr>
+        <tr>
+          <td>Generation and debugging of data processing scripts</td>
+          <td class="permission green">✓</td>
+        </tr>
+        <tr>
+          <td>Code for preliminary analysis</td>
+          <td class="permission green">✓</td>
+        </tr>
+        <tr>
+          <td>Code for automated analysis or figure generation</td>
+          <td class="permission green">✓</td>
+        </tr>
+        <tr>
+          <td>Data analysis interpretation (AI-generated statistical interpretation, uncertainty assessment, or
+            confidence rating)</td>
+          <td class="permission red">✕</td>
+        </tr>
+
+        <tr>
+          <td class="cat-cell" rowspan="3">📊 Figure and visualisation creation</td>
+          <td>Exploring options for visualisations</td>
+          <td class="permission green">✓</td>
+          <td class="attention" rowspan="3">
+            <ol>
+              <li>Disclose and document AI use for visualisation option exploration.</li>
+              <li>Ensure expert authors make final design choices and verify data fidelity.</li>
+              <li>Do not use AI to brainstorm relationships within the data or create visualisations.</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td>Brainstorming of relationships within the data</td>
+          <td class="permission red">✕</td>
+        </tr>
+        <tr>
+          <td>Creating the visualisation</td>
+          <td class="permission red">✕</td>
+        </tr>
+
+        <tr>
+          <td class="cat-cell" rowspan="3">🔎 Assessment</td>
+          <td>Creating preliminary summaries to support the assessment</td>
+          <td class="permission green">✓</td>
+          <td class="attention" rowspan="3">
+            <ol>
+              <li>Disclose and document AI-assisted summary drafting steps.</li>
+              <li>Ensure expert authors verify outputs and remain accountable for all judgments.</li>
+              <li>Keep every claim traceable to verified evidence across the full evidence base.</li>
+              <li>Do not rely on AI for drawing scientific conclusions or assigning confidence statements.</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td>Drawing scientific conclusions</td>
+          <td class="permission red">✕</td>
+        </tr>
+        <tr>
+          <td>Assigning confidence statements / writing assessment text</td>
+          <td class="permission red">✕</td>
+        </tr>
+
+        <tr>
+          <td class="cat-cell" rowspan="3">✎ Writing</td>
+          <td>Text refinement (grammar checking, word choice suggestions)</td>
+          <td class="permission green">✓</td>
+          <td class="attention" rowspan="3">
+            <ol>
+              <li>Disclose and document AI-assisted language refinement activities.</li>
+              <li>Ensure expert authors verify meaning, nuance, and accuracy line by line.</li>
+              <li>Do not use AI to generate assessment structure, content or scientific argumentation.</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td>Content structuring</td>
+          <td class="permission red">✕</td>
+        </tr>
+        <tr>
+          <td>Text drafting, redrafting and alteration</td>
+          <td class="permission red">✕</td>
+        </tr>
+
+        <tr>
+          <td class="cat-cell" rowspan="2">💬 Translation</td>
+          <td>Translation to support comprehension of literature</td>
+          <td class="permission green">✓</td>
+          <td class="attention" rowspan="2">
+            <ol>
+              <li>Disclose and document all AI-assisted translation support activities.</li>
+              <li>Translating literature from one language to another for comprehension is allowed, e.g. by Google Translate, DeepL, ChatGPT, or similar tools.</li>
+              <li>Do not use AI translation for drafting report texts.</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td>Translation to draft report texts</td>
+          <td class="permission red">✕</td>
+        </tr>
+
+        <tr>
+          <td class="cat-cell" rowspan="3">📄 Formatting and copy-editing</td>
+          <td>Checking for reference formatting</td>
+          <td class="permission green">✓</td>
+          <td class="attention" rowspan="3">
+            <ol>
+              <li>Disclose and document AI-assisted formatting and copy-editing support.</li>
+              <li>Ensure expert authors manually verify each suggested edit before acceptance.</li>
+              <li>When dealing with unpublished or sensitive content, only use AI tools in which data privacy and security are ensured, e.g, with local installations or an institutional license.</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td>Checking for formatting consistency</td>
+          <td class="permission green">✓</td>
+        </tr>
+        <tr>
+          <td>Suggestions for copy-editing</td>
+          <td class="permission green">✓</td>
+        </tr>
+
+        <tr>
+          <td class="cat-cell" rowspan="4">🛡️ Consistency and quality check</td>
+          <td>Checking for plagiarism and AI usage (only by TSU)</td>
+          <td class="permission green">✓</td>
+          <td class="attention" rowspan="4">
+            <ol>
+              <li>Disclose and document AI-assisted quality-check workflows and methods.</li>
+              <li>Use AI as support only, and keep corrections transparent and traceable.</li>
+              <li>Do not put unpublished or sensitive content into AI tools without ensuring data privacy and security.</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td>Verification of references</td>
+          <td class="permission green">✓</td>
+        </tr>
+        <tr>
+          <td>Traceability of Summary for Policymakers / Technical Summary statements</td>
+          <td class="permission green">✓</td>
+        </tr>
+        <tr>
+          <td>Consistency of terms and statements across chapters and reports</td>
+          <td class="permission green">✓</td>
+        </tr>
+
+        <tr>
+          <td class="cat-cell" rowspan="4">👥 Review comments</td>
+          <td>Classification of review comments</td>
+          <td class="permission green">✓</td>
+          <td class="attention" rowspan="4">
+            <ol>
+              <li>Disclose and document AI-assisted review-comment processing workflows and methods.</li>
+              <li>Use AI for organisation support only, and do not put review comments into a third-party AI tool without ensuring data privacy and security.</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td>Topic extraction from review comments</td>
+          <td class="permission green">✓</td>
+        </tr>
+        <tr>
+          <!-- <td>Checking AI-generated review comments</td>
+          <td class="permission green">✓</td> -->
+        </tr>
+        <tr>
+          <!-- <td>Checking comments are addressed</td>
+          <td class="permission red">✕</td> -->
+        </tr>
+
+        <tr>
+          <td class="cat-cell" rowspan="2">📑 Summary for Policymakers approval</td>
+          <td>Trickle back to full report</td>
+          <td class="permission green">✓</td>
+          <td class="attention" rowspan="2">
+            <ol>
+              <li>Disclose and document any AI-assisted support in SPM approval workflows.</li>
+              <li>Ensure expert authors validate all statements against traceable, reviewed evidence.</li>
+              <li>Do not use AI to generate new policy-relevant statements or conclusions.</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td>Extraction of evidence to formulate new statements</td>
+          <td class="permission red">✕</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="principles">
+      <div class="principles-title">Key Principles for Responsible AI Use</div>
+      <div class="principle">
+        <h3><span class="pnum">1</span>Human accountability</h3>Authors remain fully responsible for all content.
+        AI-assisted output must be critically reviewed, justified, and owned by expert authors.
+      </div>
+      <div class="principle">
+        <h3><span class="pnum">2</span>Transparency and traceability</h3>AI use must be disclosed and documented.
+        Outputs must be verified by experts and remain traceable for review and validation.
+      </div>
+      <div class="principle">
+        <h3><span class="pnum">3</span>Confidentiality and data protection</h3>Do not input sensitive or unpublished
+        material into third-party AI tools without appropriate safeguards and agreements.
+      </div>
+      <div class="principle">
+        <h3><span class="pnum">4</span>Comprehensiveness</h3>AI-assisted assessments should consider the full breadth of
+        relevant evidence and perspectives without bias.
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

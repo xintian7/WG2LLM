@@ -13,6 +13,8 @@ from openai import AzureOpenAI
 # Requested startup style: load env at import/startup.
 dotenv.load_dotenv()
 
+GPT_61_SOL_MODEL = "gpt-6.1-sol"
+
 
 def _clean(value: str | None, default: str = "") -> str:
     """Normalize env values by trimming spaces and optional surrounding quotes."""
@@ -108,6 +110,36 @@ def get_azure_model_options() -> tuple[str, ...]:
             "Azure model configuration is missing. Set AZURE_OPENAI_MODEL_NAME in .env."
         )
     return options
+
+
+def format_model_label(model: str) -> str:
+    """Format a model for display without changing its deployment name."""
+    return f"{model} (with Data and Information Protection under GDPR and ISO27001)"
+
+
+def get_editing_model_options() -> tuple[str, ...]:
+    """Return rephrasing and grammar models with Sol first and GPT-4.1 excluded."""
+    return (
+        GPT_61_SOL_MODEL,
+        *(
+            model
+            for model in get_azure_model_options()
+            if model not in (GPT_61_SOL_MODEL, "gpt-4.1")
+            and not model.startswith("gpt-4.1-")
+        ),
+    )
+
+
+def get_azure_model_settings(model: str) -> dict:
+    """Return Azure settings for the selected deployment."""
+    settings = get_azure_settings()
+    if model == GPT_61_SOL_MODEL:
+        return {
+            **settings,
+            "endpoint": "https://azureopenaitsu.openai.azure.com/",
+            "api_version": "2024-12-01-preview",
+        }
+    return settings
 
 
 def get_ai_guidance_model() -> str:

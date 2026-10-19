@@ -6,9 +6,14 @@ from typing import Callable
 
 import streamlit as st
 import streamlit.components.v1 as components
-from openai import AzureOpenAI
+from openai import NOT_GIVEN, AzureOpenAI
 
-from functions.env_loader import get_azure_model_options, get_azure_settings
+from functions.env_loader import (
+    GPT_61_SOL_MODEL,
+    format_model_label,
+    get_azure_model_settings,
+    get_editing_model_options,
+)
 from functions.write2notion import write_to_notion
 
 
@@ -56,7 +61,8 @@ def _correct_grammar_with_ai(text: str, model: str) -> tuple[bool, str, int | No
     if not model:
         raise ValueError("A model must be selected.")
 
-    settings = get_azure_settings()
+    settings = get_azure_model_settings(model)
+    is_sol = model == GPT_61_SOL_MODEL
     client = AzureOpenAI(
         api_version=settings.get("api_version") or "",
         azure_endpoint=settings.get("endpoint") or "",
@@ -87,10 +93,10 @@ def _correct_grammar_with_ai(text: str, model: str) -> tuple[bool, str, int | No
             {"role": "user", "content": user_prompt},
         ],
         model=model,
-        temperature=0,
-        top_p=1.0,
-        frequency_penalty=0.0,
-        presence_penalty=0.0,
+        temperature=NOT_GIVEN if is_sol else 0,
+        top_p=NOT_GIVEN if is_sol else 1.0,
+        frequency_penalty=NOT_GIVEN if is_sol else 0.0,
+        presence_penalty=NOT_GIVEN if is_sol else 0.0,
         max_completion_tokens=3000,
     )
 
@@ -115,10 +121,13 @@ def render_grammar_panel(get_client_ip: Callable[[], str]) -> None:
     st.markdown("Input English text (up to 3000 words) and receive a grammar-corrected version with highlighted changes.")
 
     try:
-        model_options = get_azure_model_options()
+        model_options = get_editing_model_options()
     except ValueError as exc:
         st.error(str(exc))
         return
+
+    if st.session_state.get("grammar_model", GPT_61_SOL_MODEL) not in model_options:
+        st.session_state["grammar_model"] = GPT_61_SOL_MODEL
 
     input_text = st.text_area(
         "Input text (English only, max 3000 words)",
@@ -132,6 +141,7 @@ def render_grammar_panel(get_client_ip: Callable[[], str]) -> None:
         "Model",
         options=model_options,
         index=0,
+        format_func=format_model_label,
         key="grammar_model",
     )
     share_grammar_with_tsu = st.checkbox(
