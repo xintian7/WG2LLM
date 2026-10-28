@@ -195,6 +195,13 @@
       font-size: 13px;
     }
 
+    .section-note {
+      margin: 0 0 16px;
+      padding: 10px 12px;
+      border-left: 4px solid var(--navy);
+      background: #eef5fb;
+    }
+
     .pnum {
       display: inline-flex;
       width: 22px;
@@ -228,14 +235,21 @@
 
 <body>
   <div class="page">
-    <h1>AI Use Case Reference for Assessment Development</h1>
+    <section id="section-11-6">
+      <h1>11.6 AI Use Case Reference</h1>
+      <p>The following table provides comprehensive guidance on appropriate and inappropriate AI applications
+        across all major use case categories. The guidance uses a clear symbol system to support consistent
+        interpretation and application across IPCC assessment processes.</p>
+      <p class="section-note">Please note that this AI Use Case Reference is a living document. A revised version
+        is expected following LAM3, based on the feedback from WGII authors.</p>
+      <h2>AI Use Case Reference for Assessment Development</h2>
     <div class="legend">
       <span><b class="check">✓</b> Permitted: AI use is acceptable with proper documentation, data protection, and
         verification.</span>
       <span><b class="cross">✕</b> Prohibited: AI use is strictly forbidden.</span>
     </div>
 
-    <table>
+    <table id="use-case-reference">
       <thead>
         <tr>
           <th>Category</th>
@@ -518,6 +532,7 @@
         relevant evidence and perspectives without bias.
       </div>
     </div>
+    </section>
   </div>
 </body>
 
