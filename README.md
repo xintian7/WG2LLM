@@ -1,6 +1,14 @@
 # WG2LLM
 placeholder; handbook + editorial 
 
+## WGII's AI principles and AI use case reference
+
+The **WGII's AI principles** and **AI use case reference** panels render sections
+11.5 and 11.6 directly from `userhandbook/sections-11-5-11-6.html`. **Check AI
+use cases** also uses these sections as its guidance and sends them to the
+configured Azure OpenAI service with each question. Edit that file to update the
+content; it must be present wherever the app is deployed.
+
 ## Rephrase sentences and check grammar
 
 Both model selectors default to `gpt-6.1-sol` and exclude GPT-4.1

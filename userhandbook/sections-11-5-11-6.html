@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Handbook sections 11.5–11.6: Artificial Intelligence</title>
+  <style>
+    :root { color-scheme: light; --navy: #073b70; --text: #17233a; --line: #b9c7d5; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 28px; background: #f4f6f8; color: var(--text); font: 16px/1.6 Arial, Helvetica, sans-serif; }
+    main { max-width: 65%; margin: auto; padding: 32px; background: #fff; box-shadow: 0 2px 14px rgba(0,0,0,.08); }
+    h1, h2 { color: var(--navy); line-height: 1.25; }
+    h1 { margin: 0 0 20px; font-size: 30px; }
+    h2 { margin: 30px 0 12px; font-size: 22px; }
+    li { margin: 8px 0; }
+    ul { padding-left: 26px; }
+    .note { padding: 12px 16px; border-left: 4px solid #d58a18; background: #fffaf0; }
+    .summary-callout { margin: 20px 0; padding: 16px 20px; border-left: 5px solid var(--navy); background: #eef5fb; }
+    .summary-callout h2 { margin: 0 0 8px; }
+    .summary-callout ul { margin: 0; }
+    .reference-link { margin: 20px 0; padding: 14px 18px; background: #eef5fb; border-left: 4px solid var(--navy); }
+    a { color: var(--navy); font-weight: 700; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+    .author-responsibilities { table-layout: fixed; }
+    .author-responsibilities th:first-child,
+    .author-responsibilities td:first-child { width: 16%; }
+    .author-responsibilities th:last-child,
+    .author-responsibilities td:last-child { width: 84%; }
+    th { background: var(--navy); color: white; text-align: left; }
+    th, td { padding: 10px 12px; border: 1px solid var(--line); vertical-align: top; }
+    @media (max-width: 600px) { body { padding: 0; } main { padding: 22px 18px; } h1 { font-size: 25px; } }
+    @media print { body { padding: 0; background: #fff; } main { max-width: none; box-shadow: none; padding: 0; } }
+  
+    :root {
+      --navy: #073b70;
+      --navy2: #0b477f;
+      --green: #16834a;
+      --red: #d7193f;
+      --text: #17233a;
+      --grid: #b9c7d5;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      padding: 12px;
+      background: #f4f6f8;
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .page {
+      max-width: 100%;
+      margin: auto;
+      background: white;
+      padding: 16px 18px 14px;
+      box-shadow: 0 2px 14px rgba(0, 0, 0, .08);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 34px;
+      line-height: 1.1;
+    }
+
+    .legend {
+      display: flex;
+      gap: 34px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 8px 0 16px;
+      font-size: 15px;
+    }
+
+    .legend span {
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .check,
+    .cross {
+      font-weight: 700;
+      font-size: 24px;
+      line-height: 1
+    }
+
+    .check {
+      color: var(--green)
+    }
+
+    .cross {
+      color: var(--red)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 14px;
+    }
+
+    th {
+      background: var(--navy);
+      color: white;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 16px;
+    }
+
+    th:nth-child(1) {
+      width: 15%
+    }
+
+    th:nth-child(2) {
+      width: 30%
+    }
+
+    th:nth-child(3) {
+      width: 10%
+    }
+
+    th:nth-child(4) {
+      width: 45%
+    }
+
+    td {
+      border: 1px solid var(--grid);
+      padding: 6px 10px;
+      vertical-align: middle;
+      line-height: 1.25;
+    }
+
+    .category {
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 15px;
+    }
+
+    .cat-cell {
+      background: #eef5fb;
+      font-weight: 700;
+      color: var(--navy);
+      vertical-align: top;
+    }
+
+    .permission {
+      text-align: center;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .permission.green {
+      color: var(--green)
+    }
+
+    .permission.red {
+      color: var(--red)
+    }
+
+    .attention {
+      background: #fffaf0;
+      padding: 7px 12px;
+    }
+
+    .attention ol {
+      margin: 0;
+      padding-left: 27px;
+    }
+
+    .attention li {
+      margin: 2px 0
+    }
+
+    .n {
+      display: inline-flex;
+      width: 22px;
+      height: 22px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #d58a18;
+      color: white;
+      font-weight: 700;
+      font-size: 12px;
+      margin-right: 7px;
+    }
+
+    .principles {
+      display: grid;
+      grid-template-columns: 190px repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .principles-title {
+      background: var(--navy);
+      color: white;
+      padding: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+    }
+
+    .principle {
+      background: #eaf3fb;
+      padding: 11px 12px;
+      border-radius: 7px;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .principle h3 {
+      margin: 0 0 5px;
+      color: var(--navy);
+      font-size: 13px;
+    }
+
+    .section-note {
+      margin: 0 0 16px;
+      padding: 10px 12px;
+      border-left: 4px solid var(--navy);
+      background: #eef5fb;
+    }
+
+    .pnum {
+      display: inline-flex;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: white;
+      align-items: center;
+      justify-content: center;
+      margin-right: 5px;
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0
+      }
+
+      .page {
+        box-shadow: none;
+        max-width: none
+      }
+
+      @page {
+        size: A3 landscape;
+        margin: 10mm
+      }
+    }
+  
+  </style>
+</head>
+<body>
+  <main>
+    <p class="last-update">Last update: 24-11-2026</p>
+    <h1 id="section-11-5">11.5 Use of Artificial Intelligence in the Assessment</h1>
+    <p>Authors are responsible for the core elements of IPCC assessments, including expert evaluation of methodological quality, the weighing of competing and uncertain evidence, the framing of policy relevance and scope, the development of assessment narratives, the assignment of confidence assessments, and the iterative multi-stage review process. While Artificial Intelligence (AI) can support these tasks, the use of AI should align with <a href="https://unsceb.org/products/principles-ethical-use-artificial-intelligence-united-nations-system/" target="_blank" rel="noopener noreferrer">Principles for the Ethical Use of Artificial Intelligence in the United Nations System</a> and adhere to the relevant <a href="https://www.ipcc.ch/site/assets/uploads/2018/09/ipcc-principles-appendix-a-final.pdf" target="_blank" rel="noopener noreferrer">Principles Governing IPCC Work</a>.</p>
+    <p>In applying these principles to AI use in the assessment process, the following considerations are particularly important:</p>
+    <ul>
+    <li><strong>Human accountability:</strong> Authors remain fully responsible for all content. Any AI-assisted output must be critically reviewed, justified, and ultimately owned by expert authors. AI may support the work of authors but does not replace expert judgement or responsibility.</li>
+    <li><strong>Transparency and traceability:</strong> All use of AI must be appropriately disclosed and documented. AI-generated or AI-assisted outputs must be verified by expert authors and remain sufficiently traceable to enable subsequent review, validation, and accountability.</li>
+    <li><strong>Confidentiality and data protection:</strong> Sensitive, confidential, or unpublished material, including drafts, should not be entered into third-party AI tools without appropriate safeguards, agreements, and assurances. Authors are responsible for ensuring that AI tools used comply with applicable IPCC requirements concerning confidentiality, data protection, information security, and data governance.</li>
+    <li><strong>Comprehensiveness:</strong> AI-assisted assessments should consider the full breadth of relevant evidence, knowledge, and perspectives. The use of AI should not narrow the evidence base or introduce systematic bias, and expert authors remain responsible for ensuring that relevant evidence and perspectives are appropriately considered.</li>
+    </ul>
+    <p>Specifically, the agreed use of AI in IPCC processes should therefore serve, support, and reinforce (rather than replace) human expertise, judgment, and accountability. Any use of AI technologies in IPCC assessments therefore requires careful consideration and a responsible approach in which, human authors retain full responsibility for interpretation, synthesis, conclusions, and communicated messages, as well as for ensuring compliance with IPCC principles, procedures, and ethical standards. Given the rapid evolution of AI technology, authors are encouraged to engage in ongoing dialogue about its appropriate use and effectiveness throughout the assessment cycle.</p>
+    <p>The landscape of AI is evolving rapidly, and the IPCC Principles and Procedures currently do not have specific guidance on AI usage in its assessment processes. Suggestions for guidance have been formulated at the Workshop on Methods of Assessment (MoA) organized by the IPCC Chair in February 2026. The workshop examined several methods, including AI, and aims to provide recommendations for the Panel, authors, Bureau members, and Technical Support Units on their usage in the assessment process. <a href="https://www.ipcc.ch/publication/ipcc-workshop-on-methods-of-assessment/" target="_blank" rel="noopener noreferrer">A report has been produced</a>. We recognize that inappropriate use of AI has serious reputational risks to the work of the IPCC. However, there are a few tasks where AI can potentially help authors improve the quality of the assessment. An analysis of these use cases was implemented by the TSU and the MoA Workshop Scientific Steering Committee and translated into a table with examples, which is added as a Use Case Reference in Section 11.6. Please note that this will continue to evolve based on the suggestions from the Informal Group on AI and feedback from Authors.</p>
+    <div class="summary-callout">
+    <h2>In short</h2>
+    <ul>
+    <li>IPCC processes should therefore serve, support, and reinforce human expertise, judgment, and accountability, and not replace them. This principle should be consistently upheld across all IPCC processes.</li>
+    <li>There are multiple applications of AI in our work field</li>
+    <li>Some applications are not consistent with the core principle of an IPCC assessment as the outcome of a human process</li>
+    <li>When considering using AI, compliance with these principles must be ensured.</li>
+    </ul>
+    </div>
+    <h2>Primary considerations</h2>
+    <p>The assessment texts and figures need to be produced by selected authors and should not be generated by a generative AI system whose training data, underlying assumptions, biases, and algorithms are not fully transparent. Authors should not use AI for writing assessment text, drawing scientific conclusions, or developing figures. The analysis and interpretation of scientific evidence, including uncertainty and confidence assessment, should remain under human control. Authors should maintain a complete understanding of their assessment process, from evidence evaluation to final statements. This collective in-depth understanding will be particularly needed in support to those who will be in charge of explaining and defending the report statements during plenary approval sessions.</p>
+    <p>To protect the confidentiality of IPCC assessments and to prevent unauthorized disclosure of unpublished material, authors must not input sensitive or unpublished content into third party AI-based or AI-assisted platforms and software that do not have explicit data protection agreements and safeguards in place. Authors remain responsible for ensuring that any tools used comply with IPCC rules on confidentiality, data protection, information security, and human oversight over any AI-assisted process involving IPCC materials or data.</p>
+    <p>Authors should also be aware that current AI systems have significant limitations. Information generated by AI may be outdated, incomplete, or incorrect; hidden biases may influence outputs; and automated reasoning may lead to ethically problematic outcomes. AI tools can misinterpret complex scientific contexts, oversimplify or homogenize evidence and uncertainty, hallucinate references, and generate plausible sounding but misleading or incorrect content. The non-transparent nature of many AI systems may also limit authors’ ability to fully understand, explain, and disseminate the produced outputs. These limitations reinforce the need for careful human oversight, evaluation, judgment, and accountability in all stages of the assessment process. In other words, authors remain responsible for independently verifying all AI-generated or AI-assisted outputs.</p>
+    <p>On the other hand, AI can also support authors in a number of ways. It can ease the collection and organization of literature, support language editing and translation tasks, assist with data organization and preliminary pattern identification, and facilitate certain administrative and technical activities under appropriate human oversight and verification. The following section (11.6) provides guidance on appropriate and inappropriate uses of AI in the assessment process, including the conditions under which specific uses may be permitted, required caution, or be prohibited.</p>
+    <div class="summary-callout">
+    <h2>In short</h2>
+    <ul>
+    <li>Don’t use AI to draft figures, write assessment texts, or formulate conclusions</li>
+    <li>Don’t upload drafts to third-party AI platforms without an appropriate license, but make use of TSU provided platforms</li>
+    <li>AI is a good help for literature search, language editing or data organization</li>
+    </ul>
+    </div>
+    <h2>Implementation and compliance</h2>
+    <p>All author teams must transparently document AI usage and report it individually through the mandatory AI Usage Declaration form shared by the TSU before submitting each draft, including specific tools used, purpose and context, verification methods applied, limitations encountered, and clear documentation of original sources. This helps ensure transparency and legitimacy and reassures Governments and other audiences on appropriate AI usage. The completed form must be submitted alongside each draft. The form will stay confidential within the TSUs, and only statistics will be provided to the authors.</p>
+    <p>The TSUs provide guidance on appropriate AI usage and oversight to ensure compliance with IPCC principles. Authors may consult with TSUs when considering AI applications and are encouraged to share effective practices within chapter teams. In addition, the TSU has provided a technical solution with data and information protection to support the use of AI for literature search and editorial support. Given the rapid evolution of AI technology, ongoing dialogue remains essential. Authors can direct feedback to the Co-Chairs and TSUs at: tsu@ipccwg2.org.</p>
+    <p>All submitted drafts will be systematically checked by TSU for AI-generated contents alongside standard plagiarism checks (but these tools are not proven to be very reliable in detecting AI-generated contents). Undisclosed AI usage detected during TSU review will require immediate disclosure and may result in additional documentation requirements or content revision. Failure to comply with this note may result in additional verification requirements, content revision, or other appropriate measures. Authors are reminded that maintaining the scientific integrity, credibility, legitimacy, and public trust of IPCC assessments requires strict adherence to these requirements and the continued exercise of human responsibility, judgment, and accountability by the authors, by you.</p>
+    <div class="summary-callout">
+    <h2>In short</h2>
+    <ul>
+    <li>Automatic detection of AI with software platforms is not very reliable. We rely on your self-reported use of AI to justify the use to the IPCC Plenary that needs to approve the reports</li>
+    <li>Check with TSU when in doubt whether AI use is appropriate or not. And use TSU support tools for this as much as possible.</li>
+    </ul>
+    </div>
+    <h2>Responsibilities of Authors</h2>
+    <p>To ensure that AI is used consistently, responsibly and in accordance with the principles and guidance, responsibilities are assigned based on the author roles involved in the assessment process. In addition to the common responsibility mentioned above in this section, CLAs, LAs, CSs, CAs and designated AI Points of Contact (AI PoCs) each have specific responsibilities as follows.</p>
+    <div class="table-wrap"><table class="author-responsibilities"><thead>
+    <tr><th scope="col">Role</th><th scope="col">AI-related responsibility</th></tr></thead><tbody>
+    <tr><td>CLA</td><td><strong>Overall oversight</strong><ul><li>Ensure AI use across the chapter team follows the AI principles and guidance.</li><li>Promote consistent documentation, verification, confidentiality and traceability.</li><li>Address and communicate non-compliant use to Co-Chairs and TSU.</li><li>Carry out all responsibilities of LAs.</li></ul></td></tr>
+    <tr><td>LA</td><td><strong>Accountability for content</strong><ul><li>Prevent prohibited uses.</li><li>For permitted cases, ensure AI-assisted outputs are critically reviewed, verified and traceable.</li><li>Document permitted AI use in the declaration form.</li><li>Ensure scientific judgement and final content remain with the authors.</li><li>Ensure the text contributed by CAs also follows the principles and guidance.</li></ul></td></tr>
+    <tr><td>CS</td><td><strong>Process support</strong><ul><li>Support documentation, traceability and technical checks of permitted AI use.</li><li>Flag potential risks or non-compliance to CLAs/LAs.</li></ul></td></tr>
+    <tr><td>CA</td><td><strong>Responsible use within contributions</strong><ul><li>Adhere to the rules of use of AI by all IPCC authors.</li><li>Contact the author team to fully understand the AI principles and guidance.</li><li>Report all AI uses to the author team.</li></ul></td></tr>
+    <tr><td>AI PoC</td><td><strong>Coordination</strong><ul><li>Participate in AI-related meetings and webinars organized by TSU.</li><li>Be familiar with AI principles and guidance documented in the Author Handbook.</li><li>Support the chapter teams with questions on permitted use, documentation, and disclosure.</li><li>Act as a point of contact for AI-related issues or questions, communicating with TSU and AI officer as needed.</li></ul></td></tr>
+    </tbody></table></div>
+    <p class="last-update">Last update: 24-11-2026</p>
+    <h1 id="section-11-6">11.6 AI Use Case Reference</h1>
+    <p>The following table provides comprehensive guidance on appropriate and inappropriate AI applications across all major use case categories. The guidance uses a clear symbol system to support consistent interpretation and application across IPCC assessment processes.</p>
+    <p class="note">Please note that this AI Use Case Reference is a living document. A revised version is expected following LAM3, based on the feedback from WGII authors.</p>
+    <h2>AI Use Case Reference for Assessment Development</h2>
+        <div class="legend">
+          <span><b class="check">✓</b> Permitted AI use is acceptable with proper documentation, data protection, and
+            verification.</span>
+          <span><b class="cross">✕</b> Prohibited AI use is strictly forbidden.</span>
+        </div>
+    
+        <table id="use-case-reference">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>AI Use Case</th>
+              <th>Permission</th>
+              <th>What to pay attention to</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cat-cell" rowspan="3">💡 Brainstorming and ideation</td>
+              <td>Conceptual exploration (AI queries to explore different perspectives on scientific concepts)</td>
+              <td class="permission green">✓</td>
+              <td class="attention" rowspan="3">
+                <ol>
+                  <li>Disclose and document all used AI-assisted tools.</li>
+                  <li>Ensure expert authors critically review suggestions and remain fully accountable for adopted ideas.
+                  </li>
+                  <li>Cross-check outputs with diverse evidence to reduce bias and improve comprehensiveness.</li>
+                  <li>Do not develop arguments based on AI.</li>
+    
+                </ol>
+              </td>
+            </tr>
+            <tr>
+              <td>Scope gap identification (AI assistance in identifying potential additional research questions for
+                inclusion in the report)</td>
+              <td class="permission green">✓</td>
+            </tr>
+            <tr>
+              <td>Argument development (AI assistance to develop scientific arguments)</td>
+              <td class="permission red">✕</td>
+            </tr>
+    
+            <tr>
+              <td class="cat-cell" rowspan="3">📖 Evidence and knowledge discovery, organisation, review</td>
+              <td>AI-powered search tools (preliminary literature discovery)</td>
+              <td class="permission green">✓</td>
+              <td class="attention" rowspan="3">
+                <ol>
+                  <li>Disclose and document used tools and verification methods.</li>
+                  <li>Ensure expert authors verify relevance, quality, and credibility of identified sources.</li>
+                  <li>Use multiple search approaches to avoid narrow retrieval and improve comprehensiveness.</li>
+                  <li>For quality screening: verify exclusions and check for missed evidence or systematic bias to ensure comprehensive coverage.</li>
+                </ol>
+              </td>
+            </tr>
+            <tr>
+              <td>Literature quality screening</td>
+              <td class="permission green">✓</td>
+            </tr>
+            <tr>
+              <td>Reference organisation (by topic or methodology)</td>
+              <td class="permission green">✓</td>
+            </tr>
+    
+            <tr>
+              <td class="cat-cell" rowspan="7">🗄️ Scientific analysis</td>
+              <td>Dataset organisation</td>
+              <td class="permission green">✓</td>
+              <td class="attention" rowspan="7">
+                <ol>
+                  <li>Disclose and document AI-assisted methods.</li>
+                  <li>Ensure data analysts validate all processing and analysis results before use.</li>
+                  <li>Do not interpret data patterns by AI.</li>
+                </ol>
+              </td>
+            </tr>
+            <tr>
+              <td>Data preprocessing</td>
+              <td class="permission green">✓</td>
+            </tr>
+            <tr>
+              <td>Pattern identification</td>
+              <td class="permission green">✓</td>
+            </tr>
+            <tr>
+              <td>Generation and debugging of data processing scripts</td>
+              <td class="permission green">✓</td>
+            </tr>
+            <tr>
+              <td>Code for preliminary analysis</td>
+              <td class="permission green">✓</td>
+            </tr>
+            <tr>
+              <td>Code for automated analysis or internal data visualization (not for figures used in IPCC reports)</td>
+              <td class="permission green">✓</td>
+            </tr>
+            <tr>
+              <td>Data analysis interpretation (AI-generated statistical interpretation, uncertainty assessment, or
+                confidence rating)</td>
+              <td class="permission red">✕</td>
+            </tr>
+    
+            <tr>
+              <td class="cat-cell" rowspan="3">📊 Figure and visualisation creation</td>
+              <td>Exploring options for visualisations</td>
+              <td class="permission green">✓</td>
+              <td class="attention" rowspan="3">
+                <ol>
+                  <li>Disclose and document AI use for visualisation option exploration.</li>
+                  <li>Ensure expert authors make final design choices and verify data fidelity.</li>
+                  <li>Do not use AI to brainstorm relationships within the data or create visualisations.</li>
+                </ol>
+              </td>
+            </tr>
+            <tr>
+              <td>Brainstorming of relationships within the data</td>
+              <td class="permission red">✕</td>
+            </tr>
+            <tr>
+              <td>Creating the visualisation</td>
+              <td class="permission red">✕</td>
+            </tr>
+    
+            <tr>
+              <td class="cat-cell" rowspan="3">🔎 Assessment</td>
+              <td>Creating preliminary summaries to support the assessment</td>
+              <td class="permission green">✓</td>
+              <td class="attention" rowspan="3">
+                <ol>
+                  <li>Disclose and document AI-assisted summary drafting steps.</li>
+                  <li>Ensure expert authors verify outputs and remain accountable for all judgments.</li>
+                  <li>Keep every claim traceable to verified evidence across the full evidence base.</li>
+                  <li>Do not rely on AI for drawing scientific conclusions or assigning confidence statements.</li>
+                </ol>
+              </td>
+            </tr>
+            <tr>
+              <td>Drawing scientific conclusions</td>
+              <td class="permission red">✕</td>
+            </tr>
+            <tr>
+              <td>Assigning confidence statements / writing assessment text</td>
+              <td class="permission red">✕</td>
+            </tr>
+    
+            <tr>
+              <td class="cat-cell" rowspan="3">✎ Writing</td>
+              <td>Text refinement (grammar checking, word choice suggestions)</td>
+              <td class="permission green">✓</td>
+              <td class="attention" rowspan="3">
+                <ol>
+                  <li>Disclose and document AI-assisted language refinement activities.</li>
+                  <li>Ensure expert authors verify meaning, nuance, and accuracy line by line.</li>
+                  <li>Do not use AI to generate assessment structure, content or scientific argumentation.</li>
+                </ol>
+              </td>
+            </tr>
+            <tr>
+              <td>Content structuring</td>
+              <td class="permission red">✕</td>
+            </tr>
+            <tr>
+              <td>Text drafting, redrafting and alteration</td>
+              <td class="permission red">✕</td>
+            </tr>
+    
+            <tr>
+              <td class="cat-cell" rowspan="2">💬 Translation</td>
+              <td>Translation to support comprehension of literature</td>
+              <td class="permission green">✓</td>
+              <td class="attention" rowspan="2">
+                <ol>
+                  <li>Disclose and document all AI-assisted translation support activities.</li>
+                  <li>Translating literature from one language to another for comprehension is allowed, e.g. by Google Translate, DeepL, ChatGPT, or similar tools.</li>
+                  <li>Do not use AI translation for drafting report texts.</li>
+                </ol>
+              </td>
+            </tr>
+            <tr>
+              <td>Translation to draft report texts</td>
+              <td class="permission red">✕</td>
+            </tr>
+    
+            <tr>
+              <td class="cat-cell" rowspan="3">📄 Formatting and copy-editing</td>
+              <td>Checking for reference formatting</td>
+              <td class="permission green">✓</td>
+              <td class="attention" rowspan="3">
+                <ol>
+                  <li>Disclose and document AI-assisted formatting and copy-editing support.</li>
+                  <li>Ensure expert authors manually verify each suggested edit before acceptance.</li>
+                  <li>When dealing with unpublished or sensitive content, only use AI tools in which data privacy and security are ensured, e.g, with local installations or an institutional license.</li>
+                </ol>
+              </td>
+            </tr>
+            <tr>
+              <td>Checking for formatting consistency</td>
+              <td class="permission green">✓</td>
+            </tr>
+            <tr>
+              <td>Suggestions for copy-editing</td>
+              <td class="permission green">✓</td>
+            </tr>
+    
+            <tr>
+              <td class="cat-cell" rowspan="4">🛡️ Consistency and quality check</td>
+              <td>Checking for plagiarism and AI usage (only by TSU)</td>
+              <td class="permission green">✓</td>
+              <td class="attention" rowspan="4">
+                <ol>
+                  <li>Disclose and document AI-assisted quality-check workflows and methods.</li>
+                  <li>Use AI as support only, and keep corrections transparent and traceable.</li>
+                  <li>Do not put unpublished or sensitive content into AI tools without ensuring data privacy and security.</li>
+                </ol>
+              </td>
+            </tr>
+            <tr>
+              <td>Verification of references</td>
+              <td class="permission green">✓</td>
+            </tr>
+            <tr>
+              <td>Traceability of Summary for Policymakers / Technical Summary statements</td>
+              <td class="permission green">✓</td>
+            </tr>
+            <tr>
+              <td>Consistency of terms and statements across chapters and reports</td>
+              <td class="permission green">✓</td>
+            </tr>
+    
+            <tr>
+              <td class="cat-cell" rowspan="4">👥 Review comments</td>
+              <td>Classification of review comments</td>
+              <td class="permission green">✓</td>
+              <td class="attention" rowspan="4">
+                <ol>
+                  <li>Disclose and document AI-assisted review-comment processing workflows and methods.</li>
+                  <li>Use AI for organisation support only, and do not put review comments into a third-party AI tool without ensuring data privacy and security.</li>
+                </ol>
+              </td>
+            </tr>
+            <tr>
+              <td>Topic extraction from review comments</td>
+              <td class="permission green">✓</td>
+            </tr>
+            <tr>
+              <!-- <td>Checking AI-generated review comments</td>
+              <td class="permission green">✓</td> -->
+            </tr>
+            <tr>
+              <!-- <td>Checking comments are addressed</td>
+              <td class="permission red">✕</td> -->
+            </tr>
+    
+            <tr>
+              <td class="cat-cell" rowspan="2">📑 Summary for Policymakers approval</td>
+              <td>Trickle back to full report</td>
+              <td class="permission green">✓</td>
+              <td class="attention" rowspan="2">
+                <ol>
+                  <li>Disclose and document any AI-assisted support in SPM approval workflows.</li>
+                  <li>Ensure expert authors validate all statements against traceable, reviewed evidence.</li>
+                  <li>Do not use AI to generate new policy-relevant statements or conclusions.</li>
+                </ol>
+              </td>
+            </tr>
+            <tr>
+              <td>Extraction of evidence to formulate new statements</td>
+              <td class="permission red">✕</td>
+            </tr>
+          </tbody>
+        </table>
+    
+        <div class="principles">
+          <div class="principles-title">Key Principles for Responsible AI Use</div>
+          <div class="principle">
+            <h3><span class="pnum">1</span>Human accountability</h3>Authors remain fully responsible for all content.
+            AI-assisted output must be critically reviewed, justified, and owned by expert authors.
+          </div>
+          <div class="principle">
+            <h3><span class="pnum">2</span>Transparency and traceability</h3>AI use must be disclosed and documented.
+            Outputs must be verified by experts and remain traceable for review and validation.
+          </div>
+          <div class="principle">
+            <h3><span class="pnum">3</span>Confidentiality and data protection</h3>Do not input sensitive or unpublished
+            material into third-party AI tools without appropriate safeguards and agreements.
+          </div>
+          <div class="principle">
+            <h3><span class="pnum">4</span>Comprehensiveness</h3>AI-assisted assessments should consider the full breadth of
+            relevant evidence and perspectives without bias.
+          </div>
+        </div>
+  </main>
+</body>
+</html>

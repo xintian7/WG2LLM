@@ -9,8 +9,8 @@ The WGII AI Assistant helps users:
 - check whether a proposed AI use case is aligned with WGII AI guidance,
 - rephrase English text into formal scientific writing style,
 - correct English grammar with highlighted edits,
-- report new AI use cases to WGII TSU,
-- view a reference figure for AI use cases,
+- read WGII's AI principles from the Author Handbook,
+- view the AI use case reference,
 - access Terms of Use and Privacy Policy,
 - submit feedback to WGII TSU.
 
@@ -34,16 +34,14 @@ Use the deployed WGII AI Assistant URL provided by WGII TSU.
 
 - Enter a question such as: "Can I use AI to rephrase assessment text?"
 - Click **Submit** to receive a guidance-based answer.
-- Output is grounded in the guidance content bundled with the app.
+- Output is based on sections 11.5 and 11.6 of the Author Handbook. These sections
+  are sent to the configured Azure OpenAI service with the question.
 
 ![alt text](image.png)
 
 ### View AI use case reference
 
-- Opens the AI use case reference figure.
-- You can view and download the image.
-- You can also expand the figure to a full size by clicking the button on the top left. 
-![alt text](image-1.png)
+- Opens the AI use case reference from section 11.6 of the Author Handbook.
 
 ### Rephrase sentences
 
@@ -62,11 +60,9 @@ Use the deployed WGII AI Assistant URL provided by WGII TSU.
 	- **Highlighted changes** (edits marked in context).
 - Optional: enable the checkbox to share prompts/results with TSU for app improvement.
 
-### Report a new AI use case
+### WGII's AI principles
 
-- Open **Report a new AI use case** from the main buttons.
-- Submit examples of new or unclear AI use cases that should be considered for future guidance updates.
-- Add contact information if you want WGII TSU to follow up.
+- Open **WGII's AI principles** from the main buttons to read section 11.5 of the Author Handbook.
 
 ### Use case scenario analysis
 
@@ -75,7 +71,7 @@ Use the deployed WGII AI Assistant URL provided by WGII TSU.
 ### Give feedback
 
 - Open **Give feedback** from the sidebar to access the dedicated feedback page.
-- Share questions, issues, or suggestions using the feedback form.
+- Share questions, issues, or suggestions, including new AI use cases, using the feedback form.
 - Feedback is submitted to the TSU feedback database for app improvement.
 
 ## 4) How responses are framed
@@ -85,6 +81,7 @@ For permission-check style prompts, the app returns:
 1. Permission category.
 2. Why (brief reason from guidance).
 3. What to pay attention to (conditions, cautions, and limits).
+4. AI principles from section 11.5.
 
 If a question is outside the guidance scope, the app indicates that directly.
 

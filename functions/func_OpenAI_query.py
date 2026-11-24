@@ -23,20 +23,6 @@ ANSWER_TEMPLATE = (
     "- <Add more bullets when relevant; if none are mentioned, write: Not explicitly mentioned in the guidance.>"
 )
 
-GENERAL_AI_STANDARD_RESPONSE = (
-    "1) Permission category: Conditionally permitted\n"
-    "2) Why: AI use in IPCC assessments is allowed only for specific support tasks such as grammar checking, word choice suggestions, literature discovery, data organization, and brainstorming, among others. However, AI must not be used for drafting assessment text, drawing scientific conclusions, or creating figures, as these require expert human judgment. All AI usage must be documented and comply with confidentiality and ethical principles.\n"
-    "3) What to pay attention to:\n"
-    "- AI cannot be used to generate assessment text, summaries, scientific conclusions, or figures.\n"
-    "- AI can assist with grammar, word choice, literature search, data cleaning, and brainstorming but requires author verification and responsibility.\n"
-    "- Confidentiality of draft content must be maintained; do not input unpublished material into AI systems without explicit data protection guarantees.\n"
-    "- All AI use must be declared via the AI Usage Declaration form with details on tools, purpose, verification, and limitations.\n"
-    "- Authors must maintain full understanding and responsibility for any AI-assisted content.\n"
-    "- TSUs provide oversight and may check drafts for undisclosed AI use.\n"
-    "- Use multiple AI models for brainstorming to reduce bias.\n"
-    "- AI tools have limitations such as outdated information, biases, and potential for incorrect outputs."
-)
-
 QUESTION_ROUTING_RULES = (
     "Classify the user question into one of three categories:\n"
     "(1) General AI questions that are covered by the guidance text's AI introduction/explanatory sections.\n"
@@ -47,8 +33,7 @@ QUESTION_ROUTING_RULES = (
     "Response rules:\n"
     "- For (1): answer the question directly in plain prose based on guidance. Do NOT use the numbered template.\n"
     "- For (2): use the exact numbered template provided.\n"
-    "- For broad questions about whether AI can be used in IPCC assessments in general, return this exact response:\n"
-    f"{GENERAL_AI_STANDARD_RESPONSE}\n"
+    "- For broad questions about whether AI can be used in IPCC assessments in general, use the numbered template and base the answer on the provided guidance.\n"
     "- For (3): respond exactly with: This question is not related to the AI guidance.\n"
     "Always use only the provided guidance text. Do not rely on outside knowledge."
 )
@@ -144,18 +129,19 @@ def query_openai_with_guidance_result(
     api_key: str = "",
     api_version: str = "",
     model: str = "",
+    guidance_text: str | None = None,
 ) -> tuple[str, int | None, int | None]:
     """Query Azure OpenAI and return answer plus prompt/completion token usage."""
     if not (question or "").strip():
         raise ValueError("Question is empty.")
 
-    guidance_path = _resolve_guidance_path(md_filename)
-    if not guidance_path.exists():
-        raise FileNotFoundError(f"Guidance file is missing: {guidance_path}")
-
-    guidance_text = _load_guidance_text(guidance_path)
-    if not guidance_text:
-        raise ValueError(f"Guidance file is empty: {guidance_path}")
+    if guidance_text is None:
+        guidance_path = _resolve_guidance_path(md_filename)
+        if not guidance_path.exists():
+            raise FileNotFoundError(f"Guidance file is missing: {guidance_path}")
+        guidance_text = _load_guidance_text(guidance_path)
+    if not guidance_text.strip():
+        raise ValueError("Guidance text is empty.")
 
     settings = get_azure_settings()
     api_key_candidates = _dedupe_non_empty(
@@ -213,6 +199,9 @@ def query_openai_with_guidance_result(
                                         "content": (
                                             "You are an IPCC WGII AI guidance assistant. "
                                             "Use only the provided guidance text as your knowledge base. "
+                                            "The guidance may be HTML: interpret table rowspans, "
+                                            "✓ as permitted and ✕ as prohibited, and apply the "
+                                            "associated cautions to all rows they span. "
                                             f"{QUESTION_ROUTING_RULES}\n\n"
                                             f"{ANSWER_TEMPLATE}"
                                         ),
@@ -225,7 +214,7 @@ def query_openai_with_guidance_result(
                                         ),
                                     },
                                 ],
-                                max_completion_tokens=256,
+                                max_completion_tokens=800,
                                 temperature=0,
                                 top_p=1.0,
                                 frequency_penalty=0.0,

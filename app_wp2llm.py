@@ -3,11 +3,12 @@ from pathlib import Path
 from functions.feedback_form import FeedbackConfig, render_feedback_form
 from functions.main_buttons import render_main_buttons
 from functions.panel_ai_guidance import render_ai_guidance_panel
+from functions.panel_ai_principles import render_ai_principles
 from functions.panel_grammar import render_grammar_panel
 from functions.panel_reference import render_ai_use_case_reference
 from functions.panel_rephrase import render_rephrase_panel
 
-ver = "0.5"
+ver = "0.6"
 
 st.markdown("""
 <style>
@@ -91,7 +92,7 @@ div.stDownloadButton > button {
 .st-key-main_btn_rephrase button,
 .st-key-main_btn_grammar button,
 .st-key-main_btn_reference button,
-.st-key-main_btn_report button,
+.st-key-main_btn_principles button,
 .st-key-main_btn_analysis button {
     min-height: 48px;
     padding: 0.5rem 1.25rem;
@@ -212,6 +213,25 @@ if page_key == "feedback":
     render_feedback_page()
     st.stop()
 
+st.markdown("""
+<style>
+div[data-testid="stMainBlockContainer"] {
+    width: 100% !important;
+    max-width: 60vw !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+@media (max-width: 700px) {
+    div[data-testid="stMainBlockContainer"] {
+        max-width: 100vw !important;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}
+</style>
+""", unsafe_allow_html=True)
 
 active_panel = render_main_buttons()
 
@@ -219,25 +239,8 @@ if active_panel == "ai_guidance":
     render_ai_guidance_panel(_get_client_ip)
 elif active_panel == "view_use_cases":
     render_ai_use_case_reference()
-elif active_panel == "report_use_case":
-    render_feedback_form(
-        FeedbackConfig(
-            app_name="TSU_LLM_ReportNewUseCase",
-            form_key="report_use_case_form",
-            title="Report a new AI use case",
-            show_divider=True,
-            center_title=True,
-            intro_text=(
-                "Please share new AI use cases that you think should be included in the AI guidance use case reference. "
-                "Our WGII TSU will discuss and review all cases carefully and get "
-                "back to you if you indicate that we can contact you."
-            ),
-            required_prompt_label="New AI use case *",
-            submit_button_type="primary",
-            enter_to_submit=False,
-            submit_instruction_text="Click the button",
-        )
-    )
+elif active_panel == "ai_principles":
+    render_ai_principles()
 elif active_panel == "rephrase":
     render_rephrase_panel(_get_client_ip)
 elif active_panel == "grammar":
@@ -286,8 +289,9 @@ with st.sidebar:
     st.checkbox("Add feature rephrase sentences. （v0.4）", value=True, key="todo_rephrase_sentences")
     st.checkbox("Add AI principles. （v0.4）", value=True, key="todo_ai_principles")
     st.checkbox("General maintenance. （v0.5）", value=True, key="todo_maintenance")
-    st.checkbox("Add use case scenario analysis. （v0.5）", value=False, key="todo_use_case_scenario_analysis")
-    st.checkbox("Revise the use case reference based on the MA report. （v0.6）", value=False, key="todo_more_ai_use_cases")
+    st.checkbox("Revise the AI principles and use case references. （v0.6）", value=True, key="todo_more_ai_use_cases")
+    st.checkbox("Add FAQ and use case scenario analysis. （v0.7）", value=False, key="todo_use_case_scenario_analysis")
+
     # st.checkbox("Add more models from Azure OpenAI, Mistral, Claude, etc. （v0.6）", value=False, key="todo_more_models")
     # st.checkbox("Content comparison between AR7 and AR6. （v0.7）", value=False, key="todo_content_comparison")
 

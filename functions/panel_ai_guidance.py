@@ -1,46 +1,24 @@
-from pathlib import Path
 from typing import Callable
 
 import streamlit as st
 
-from functions.env_loader import format_model_label, get_ai_guidance_model, get_azure_settings
+from functions.env_loader import format_model_label, get_ai_guidance_model
 from functions.func_OpenAI_query import query_openai_with_guidance_result
+from functions.handbook import load_handbook_guidance
 from functions.write2notion import write_to_notion
-
-
-_GUIDANCE_MD = Path(__file__).resolve().parent.parent / "AIGuidance_20260428.md.enc"
-_AI_PRINCIPLES_TXT = Path(__file__).resolve().parent.parent / "AI Principles.txt"
 
 
 def get_ai_guidance_status() -> dict:
     """Return guidance availability status for UI display."""
-    if not _GUIDANCE_MD.exists():
+    try:
+        load_handbook_guidance()
+    except (OSError, UnicodeError, ValueError) as exc:
         return {
             "ready": False,
             "chunks": 0,
             "cached": False,
             "last_load_sec": None,
-            "message": f"Guidance file not found: {_GUIDANCE_MD.name}",
-        }
-
-    token = _GUIDANCE_MD.read_bytes().strip()
-    if not token:
-        return {
-            "ready": False,
-            "chunks": 0,
-            "cached": False,
-            "last_load_sec": None,
-            "message": f"Guidance file is empty: {_GUIDANCE_MD.name}",
-        }
-
-    settings = get_azure_settings()
-    if not (settings.get("fernet_key") or "").strip():
-        return {
-            "ready": False,
-            "chunks": 0,
-            "cached": False,
-            "last_load_sec": None,
-            "message": "FERNET_KEY is not set in environment.",
+            "message": f"Could not load handbook guidance: {exc}",
         }
 
     return {
@@ -48,33 +26,20 @@ def get_ai_guidance_status() -> dict:
         "chunks": 1,
         "cached": False,
         "last_load_sec": None,
-        "message": "Guidance markdown loaded.",
+        "message": "Handbook sections 11.5 and 11.6 loaded.",
     }
 
 
 def _answer_ai_case_question(
     question: str,
     model: str,
+    guidance: str,
 ) -> tuple[str, int | None, int | None]:
-    return query_openai_with_guidance_result(question=question, model=model)
+    return query_openai_with_guidance_result(question=question, model=model, guidance_text=guidance)
 
 
-def _load_ai_principles_text() -> str:
-    if not _AI_PRINCIPLES_TXT.exists():
-        return ""
-    return _AI_PRINCIPLES_TXT.read_text(encoding="utf-8").strip()
-
-
-def _append_point_four(answer: str) -> str:
-    base = (answer or "").strip()
-    principles = _load_ai_principles_text()
-    if not principles:
-        return base
-
-    lowered = base.lower()
-    if "4)" in lowered and "ai principles" in lowered:
-        return base
-
+def _append_point_four(answer: str, principles: str) -> str:
+    base = _strip_point_four(answer)
     if not base:
         return f"4) AI principles:\n{principles}"
 
@@ -142,15 +107,14 @@ def perform_ai_guidance(
         container.warning("Please enter a question before submitting.")
         return "", None, None
 
-    if not _GUIDANCE_MD.exists():
-        container.error(f"Guidance file is missing: {_GUIDANCE_MD.name}")
-        return "", None, None
-
     with container:
         with st.spinner("Checking AI use case..."):
             try:
-                answer, token_input, token_output = _answer_ai_case_question(question, model=model)
-                answer_with_point_four = _append_point_four(answer or "")
+                guidance, principles = load_handbook_guidance()
+                answer, token_input, token_output = _answer_ai_case_question(question, model=model, guidance=guidance)
+                if not answer.strip():
+                    raise ValueError("No answer content was returned by Azure OpenAI.")
+                answer_with_point_four = _append_point_four(answer or "", principles)
                 st.session_state["ai_case_last_query"] = question
                 st.session_state["ai_case_result_box"] = (
                     answer_with_point_four or "No answer content was returned by Azure OpenAI."
@@ -171,15 +135,7 @@ def render_ai_guidance_panel(get_client_ip: Callable[[], str]) -> None:
     with ai_guidance_container:
         kb_status = get_ai_guidance_status()
         if kb_status["ready"]:
-            parts = [
-                "Knowledge base: ready",
-                f"Indexed chunks: {kb_status['chunks']}",
-            ]
-            if kb_status["last_load_sec"] is not None:
-                parts.append(f"Last engine load: {kb_status['last_load_sec']}s")
-            if kb_status["cached"]:
-                parts.append("Engine cache: warm")
-            st.caption(" | ".join(parts))
+            st.caption(f"Knowledge base: ready | {kb_status['message']}")
         else:
             msg = kb_status["message"] or "Knowledge base is not ready yet."
             st.caption(f"Knowledge base: not ready | {msg}")
