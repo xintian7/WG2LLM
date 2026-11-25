@@ -69,7 +69,7 @@ div[data-testid="stMarkdown"]:has(.wgii-handbook) { width: 100%; max-width: 100%
 
 
 def _section_start(text: str, heading: str) -> int:
-    """Start at the "Last update" line directly above the heading, if present."""
+    """Start at the "Last updated" line directly above the heading, if present."""
     heading_index = text.index(heading)
     update_index = text.rfind(_LAST_UPDATE, 0, heading_index)
     if update_index != -1 and text[update_index:heading_index].count("<p") == 1:
