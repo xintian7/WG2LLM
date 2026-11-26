@@ -7,7 +7,8 @@ The **WGII's AI principles** and **AI use case reference** panels render section
 11.5 and 11.6 directly from `userhandbook/sections-11-5-11-6.html`. **Check AI
 use cases** also uses these sections as its guidance and sends them to the
 configured Azure OpenAI service with each question. Edit that file to update the
-content; it must be present wherever the app is deployed.
+content; it must be present wherever the app is deployed. The two panel buttons
+are marked with a **NEW** badge.
 
 ## Rephrase sentences and check grammar
 

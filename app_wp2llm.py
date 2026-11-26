@@ -105,6 +105,46 @@ div.stDownloadButton > button {
     color: #ffffff !important;
 }
 
+.st-key-main_btn_principles,
+.st-key-main_btn_reference,
+.st-key-main_btn_analysis {
+    margin-top: 1.75rem;
+}
+
+.st-key-main_btn_principles button,
+.st-key-main_btn_reference button {
+    position: relative;
+    overflow: visible;
+}
+
+.st-key-main_btn_principles button::before,
+.st-key-main_btn_reference button::before {
+    content: "NEW";
+    position: absolute;
+    top: -1.75rem;
+    right: 0.5rem;
+    width: 3rem;
+    height: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #d71920;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1;
+    clip-path: polygon(
+        50% 0%, 59% 12%, 70% 3%, 76% 18%, 89% 15%,
+        91% 31%, 100% 38%, 94% 50%, 100% 62%, 91% 69%,
+        89% 85%, 76% 82%, 70% 97%, 59% 88%, 50% 100%,
+        41% 88%, 30% 97%, 24% 82%, 11% 85%, 9% 69%,
+        0% 62%, 6% 50%, 0% 38%, 9% 31%, 11% 15%,
+        24% 18%, 30% 3%, 41% 12%
+    );
+    transform: rotate(7deg);
+    pointer-events: none;
+}
+
 .st-key-main_btn_analysis button:hover {
     background-color: var(--btn-gray-hover) !important;
     border-color: var(--btn-gray-hover) !important;
